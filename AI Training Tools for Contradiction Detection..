@@ -1,0 +1,631 @@
+#!/usr/bin/env python3
+"""
+AI Training Tools for Contradiction Detection
+Helps train ChatGPT, Claude, and other AI systems on contradiction handling
+"""
+
+import json
+import csv
+import random
+from typing import List, Dict, Any, Optional, Tuple
+from dataclasses import dataclass, asdict
+from pathlib import Path
+
+from ..core.types import Contradiction, LearningEvent, ContradictionType
+
+
+@dataclass
+class TrainingExample:
+    """A single training example for AI systems."""
+    id: str
+    premise: str
+    query: str
+    contradiction_type: str
+    explanation: str
+    human_patch: str
+    repair_action: str
+    domain: str
+    difficulty_level: int  # 1-5 scale
+    
+    
+@dataclass  
+class AIBenchmarkResult:
+    """Results from testing an AI system on contradiction detection."""
+    system_name: str
+    version: str
+    test_date: str
+    accuracy: float
+    precision_by_type: Dict[str, float]
+    recall_by_type: Dict[str, float]
+    processing_time: float
+    examples_tested: int
+    
+
+class ContradictionTrainingDataGenerator:
+    """
+    Generates training data for AI systems from recursive loop results.
+    Supports multiple export formats for different AI training pipelines.
+    """
+    
+    def __init__(self):
+        self.training_examples = []
+        self.ai_benchmark_results = []
+        
+    def process_learning_log(self, learning_log_path: str) -> List[TrainingExample]:
+        """
+        Convert recursive AGI learning log into training examples.
+        
+        Args:
+            learning_log_path: Path to the learning log JSON file
+            
+        Returns:
+            List of training examples
+        """
+        with open(learning_log_path, 'r') as f:
+            log_data = json.load(f)
+        
+        examples = []
+        learning_events = log_data.get('learning_events', [])
+        
+        # Group events by contradiction
+        contradictions = {}
+        patches = {}
+        
+        for event in learning_events:
+            if event['event_type'] == 'contradiction_detection':
+                claim_id = event['data'].get('claim_id')
+                contradictions[claim_id] = event['data']
+            elif event['event_type'] == 'patch_application':
+                contradiction_id = event['data'].get('contradiction_id')
+                patches[contradiction_id] = event['data']
+        
+        # Create training examples
+        for claim_id, contradiction_data in contradictions.items():
+            patch_data = patches.get(f"contradiction_{hash(claim_id)}", {})
+            
+            example = TrainingExample(
+                id=claim_id,
+                premise=contradiction_data.get('premise', ''),
+                query=contradiction_data.get('query', ''),
+                contradiction_type=contradiction_data.get('type', ''),
+                explanation=contradiction_data.get('note', ''),
+                human_patch=patch_data.get('human_insight', ''),
+                repair_action=patch_data.get('repair_action', ''),
+                domain=contradiction_data.get('domain', 'unknown'),
+                difficulty_level=self._assess_difficulty(contradiction_data)
+            )
+            examples.append(example)
+        
+        self.training_examples.extend(examples)
+        return examples
+    
+    def export_for_openai_finetuning(self, output_path: str, 
+                                   format_type: str = 'chat') -> None:
+        """
+        Export training data in OpenAI fine-tuning format.
+        
+        Args:
+            output_path: Path to save the training file
+            format_type: 'chat' or 'completion' format
+        """
+        training_data = []
+        
+        for example in self.training_examples:
+            if format_type == 'chat':
+                # Chat format for GPT-3.5-turbo and GPT-4
+                entry = {
+                    "messages": [
+                        {
+                            "role": "system",
+                            "content": "You are an expert at detecting logical contradictions. Analyze the premise and query to identify contradiction types: Type I (Direct Negation), Type II (Property Mismatch), Type III (Definitional Violation), Type IV (Counterexample to Universal), or None."
+                        },
+                        {
+                            "role": "user", 
+                            "content": f"Premise: {example.premise}\nQuery: {example.query}\n\nWhat type of contradiction is this?"
+                        },
+                        {
+                            "role": "assistant",
+                            "content": f"This is a {example.contradiction_type}. {example.explanation}\n\nSuggested repair: {example.repair_action}"
+                        }
+                    ]
+                }
+            else:
+                # Completion format for older models
+                entry = {
+                    "prompt": f"Premise: {example.premise}\nQuery: {example.query}\nContradiction type:",
+                    "completion": f" {example.contradiction_type}. {example.explanation}"
+                }
+            
+            training_data.append(entry)
+        
+        with open(output_path, 'w') as f:
+            for entry in training_data:
+                f.write(json.dumps(entry) + '\n')
+    
+    def export_for_anthropic_training(self, output_path: str) -> None:
+        """
+        Export training data optimized for Anthropic Claude training.
+        Uses Constitutional AI principles and detailed reasoning.
+        """
+        training_data = []
+        
+        for example in self.training_examples:
+            # Anthropic format emphasizes reasoning and helpfulness
+            entry = {
+                "human": f"""I need help analyzing this logical statement for contradictions:
+
+Premise: {example.premise}
+Query: {example.query}
+Domain: {example.domain}
+
+Please identify if there's a logical contradiction and explain your reasoning step by step.""",
+                
+                "assistant": f"""I'll analyze this step by step for logical contradictions:
+
+**Analysis:**
+1. **Premise examination**: {example.premise}
+2. **Query examination**: {example.query}
+3. **Domain context**: {example.domain}
+
+**Contradiction Detection:**
+This represents a **{example.contradiction_type}**.
+
+**Reasoning:**
+{example.explanation}
+
+**Human Expert Insight:**
+{example.human_patch}
+
+**Suggested Repair Strategy:**
+{example.repair_action}
+
+This type of contradiction is important to catch because it can lead to logical inconsistencies in reasoning systems. The repair strategy addresses the core issue while preserving the intended meaning."""
+            }
+            training_data.append(entry)
+        
+        with open(output_path, 'w') as f:
+            json.dump(training_data, f, indent=2)
+    
+    def export_for_generic_training(self, output_path: str, format: str = 'csv') -> None:
+        """
+        Export in generic format for any AI training pipeline.
+        
+        Args:
+            output_path: Path to save file
+            format: 'csv', 'json', or 'tsv'
+        """
+        if format == 'csv':
+            with open(output_path, 'w', newline='') as f:
+                writer = csv.writer(f)
+                writer.writerow([
+                    'id', 'premise', 'query', 'contradiction_type', 'explanation',
+                    'human_patch', 'repair_action', 'domain', 'difficulty_level'
+                ])
+                
+                for example in self.training_examples:
+                    writer.writerow([
+                        example.id, example.premise, example.query,
+                        example.contradiction_type, example.explanation,
+                        example.human_patch, example.repair_action,
+                        example.domain, example.difficulty_level
+                    ])
+        
+        elif format == 'json':
+            with open(output_path, 'w') as f:
+                json.dump([asdict(example) for example in self.training_examples], 
+                         f, indent=2)
+        
+        elif format == 'tsv':
+            with open(output_path, 'w') as f:
+                f.write('\t'.join([
+                    'id', 'premise', 'query', 'contradiction_type', 'explanation',
+                    'human_patch', 'repair_action', 'domain', 'difficulty_level'
+                ]) + '\n')
+                
+                for example in self.training_examples:
+                    f.write('\t'.join([
+                        str(getattr(example, field)) for field in [
+                            'id', 'premise', 'query', 'contradiction_type', 'explanation',
+                            'human_patch', 'repair_action', 'domain', 'difficulty_level'
+                        ]
+                    ]) + '\n')
+    
+    def generate_synthetic_examples(self, base_examples: List[TrainingExample], 
+                                  count: int = 100) -> List[TrainingExample]:
+        """
+        Generate synthetic training examples through mutation and variation.
+        
+        Args:
+            base_examples: Existing examples to use as templates
+            count: Number of synthetic examples to generate
+            
+        Returns:
+            List of synthetic training examples
+        """
+        synthetic_examples = []
+        
+        # Template patterns for each contradiction type
+        templates = {
+            "Type II: Property Mismatch": [
+                ("At {condition}, {substance} {property} at {value1}{unit}", 
+                 "{substance} true {property} {value2}{unit} {condition}"),
+                ("Under {condition}, {object} has {property} of {value1}", 
+                 "{object} false has {property} {value2} {condition}"),
+            ],
+            "Type III: Definitional Violation": [
+                ("{category} have exactly {property}", 
+                 "{instance} false have {property}"),
+                ("By definition, {category} are {property}", 
+                 "{instance} true not {property}"),
+            ],
+            "Type IV: Counterexample to Universal": [
+                ("All {category} {property}", 
+                 "{exception} false {property}"),
+                ("Every {category} exhibits {behavior}", 
+                 "{exception} true not {behavior}"),
+            ]
+        }
+        
+        # Value substitutions
+        substitutions = {
+            'condition': ['sea level', 'high altitude', 'standard pressure', 'room temperature'],
+            'substance': ['water', 'alcohol', 'oil', 'mercury'],
+            'property': ['boils', 'freezes', 'melts', 'evaporates'],
+            'value1': ['100', '0', '50', '25'],
+            'value2': ['95', '5', '45', '30'],
+            'unit': ['C', 'F', 'K'],
+            'category': ['mammals', 'birds', 'triangles', 'squares'],
+            'instance': ['platypus', 'penguin', 'damaged triangle', 'rotated square'],
+            'object': ['ball', 'cube', 'sphere', 'cylinder'],
+            'exception': ['platypus', 'echidna', 'whale', 'bat'],
+            'behavior': ['give live birth', 'fly', 'swim', 'hibernate']
+        }
+        
+        for i in range(count):
+            # Randomly select a contradiction type and template
+            contradiction_type = random.choice(list(templates.keys()))
+            premise_template, query_template = random.choice(templates[contradiction_type])
+            
+            # Generate substitution values
+            subs = {}
+            for key in substitutions:
+                if f'{{{key}}}' in premise_template or f'{{{key}}}' in query_template:
+                    subs[key] = random.choice(substitutions[key])
+            
+            # Apply substitutions
+            try:
+                premise = premise_template.format(**subs)
+                query = query_template.format(**subs)
+                
+                # Generate explanation based on type
+                if "Property Mismatch" in contradiction_type:
+                    explanation = f"Property value conflict: premise states {subs.get('value1', 'X')}, query states {subs.get('value2', 'Y')}"
+                elif "Definitional Violation" in contradiction_type:
+                    explanation = f"Query violates definitional property of {subs.get('category', 'category')}"
+                elif "Counterexample" in contradiction_type:
+                    explanation = f"{subs.get('exception', 'Exception')} is a known counterexample to the universal claim"
+                else:
+                    explanation = "Synthetic contradiction generated from template"
+                
+                synthetic_example = TrainingExample(
+                    id=f"synthetic_{i:04d}",
+                    premise=premise,
+                    query=query,
+                    contradiction_type=contradiction_type,
+                    explanation=explanation,
+                    human_patch=f"Synthetic patch for {contradiction_type}",
+                    repair_action="Add conditions or revise quantifier",
+                    domain="synthetic",
+                    difficulty_level=random.randint(2, 4)
+                )
+                
+                synthetic_examples.append(synthetic_example)
+                
+            except KeyError:
+                # Skip if template substitution fails
+                continue
+        
+        self.training_examples.extend(synthetic_examples)
+        return synthetic_examples
+    
+    def create_difficulty_split(self, test_split: float = 0.2) -> Dict[str, List[TrainingExample]]:
+        """
+        Split training examples by difficulty for curriculum learning.
+        
+        Args:
+            test_split: Fraction of data to reserve for testing
+            
+        Returns:
+            Dictionary with 'easy', 'medium', 'hard', 'test' splits
+        """
+        # Sort by difficulty
+        sorted_examples = sorted(self.training_examples, key=lambda x: x.difficulty_level)
+        
+        # Split into difficulty levels
+        easy = [ex for ex in sorted_examples if ex.difficulty_level <= 2]
+        medium = [ex for ex in sorted_examples if ex.difficulty_level == 3]
+        hard = [ex for ex in sorted_examples if ex.difficulty_level >= 4]
+        
+        # Reserve test set from each difficulty level
+        random.shuffle(easy)
+        random.shuffle(medium)
+        random.shuffle(hard)
+        
+        easy_test_size = int(len(easy) * test_split)
+        medium_test_size = int(len(medium) * test_split)
+        hard_test_size = int(len(hard) * test_split)
+        
+        return {
+            'easy': easy[easy_test_size:],
+            'medium': medium[medium_test_size:],
+            'hard': hard[hard_test_size:],
+            'test': easy[:easy_test_size] + medium[:medium_test_size] + hard[:hard_test_size]
+        }
+    
+    def _assess_difficulty(self, contradiction_data: Dict[str, Any]) -> int:
+        """Assess difficulty level of a contradiction (1-5 scale)."""
+        # Simple heuristic based on contradiction type and complexity
+        contradiction_type = contradiction_data.get('type', '')
+        
+        if 'Type I' in contradiction_type:
+            return 1  # Direct negations are easiest
+        elif 'Type II' in contradiction_type:
+            return 2  # Property mismatches are easy-medium
+        elif 'Type III' in contradiction_type:
+            return 3  # Definitional violations are medium
+        elif 'Type IV' in contradiction_type:
+            return 4  # Counterexamples are harder
+        else:
+            return 2  # Default medium-easy
+
+
+class AISystemBenchmarker:
+    """
+    Benchmarking framework for testing AI systems on contradiction detection.
+    Supports comparison between different AI models and the MBT system.
+    """
+    
+    def __init__(self):
+        self.benchmark_results = []
+        self.test_suite = []
+    
+    def load_test_suite(self, test_examples: List[TrainingExample]) -> None:
+        """Load test examples for benchmarking."""
+        self.test_suite = test_examples
+    
+    def benchmark_ai_system(self, 
+                           system_name: str,
+                           system_version: str,
+                           prediction_function: callable,
+                           test_examples: Optional[List[TrainingExample]] = None) -> AIBenchmarkResult:
+        """
+        Benchmark an AI system's contradiction detection performance.
+        
+        Args:
+            system_name: Name of the AI system (e.g., "ChatGPT", "Claude")
+            system_version: Version identifier
+            prediction_function: Function that takes (premise, query) and returns contradiction_type
+            test_examples: Optional test examples (uses loaded test suite if None)
+            
+        Returns:
+            Benchmark results
+        """
+        if test_examples is None:
+            test_examples = self.test_suite
+        
+        if not test_examples:
+            raise ValueError("No test examples available")
+        
+        correct_predictions = 0
+        predictions_by_type = {}
+        actual_by_type = {}
+        processing_times = []
+        
+        for example in test_examples:
+            import time
+            start_time = time.time()
+            
+            try:
+                predicted_type = prediction_function(example.premise, example.query)
+                processing_time = time.time() - start_time
+                processing_times.append(processing_time)
+                
+                # Track predictions and actuals by type
+                actual_type = example.contradiction_type
+                predictions_by_type.setdefault(predicted_type, []).append(actual_type)
+                actual_by_type.setdefault(actual_type, []).append(predicted_type)
+                
+                if predicted_type == actual_type:
+                    correct_predictions += 1
+                    
+            except Exception as e:
+                print(f"Error processing example {example.id}: {e}")
+                processing_times.append(0.0)
+        
+        # Calculate metrics
+        accuracy = correct_predictions / len(test_examples) if test_examples else 0.0
+        
+        precision_by_type = {}
+        recall_by_type = {}
+        
+        for pred_type, actual_types in predictions_by_type.items():
+            true_positives = sum(1 for at in actual_types if at == pred_type)
+            precision_by_type[pred_type] = true_positives / len(actual_types) if actual_types else 0.0
+        
+        for actual_type, pred_types in actual_by_type.items():
+            true_positives = sum(1 for pt in pred_types if pt == actual_type)
+            recall_by_type[actual_type] = true_positives / len(pred_types) if pred_types else 0.0
+        
+        result = AIBenchmarkResult(
+            system_name=system_name,
+            version=system_version,
+            test_date=str(time.time()),
+            accuracy=accuracy,
+            precision_by_type=precision_by_type,
+            recall_by_type=recall_by_type,
+            processing_time=sum(processing_times) / len(processing_times) if processing_times else 0.0,
+            examples_tested=len(test_examples)
+        )
+        
+        self.benchmark_results.append(result)
+        return result
+    
+    def compare_systems(self, results: List[AIBenchmarkResult]) -> Dict[str, Any]:
+        """Compare multiple AI systems' performance."""
+        
+        comparison = {
+            "systems": [],
+            "accuracy_ranking": [],
+            "speed_ranking": [],
+            "best_by_type": {},
+            "summary": {}
+        }
+        
+        for result in results:
+            system_info = {
+                "name": result.system_name,
+                "version": result.version,
+                "accuracy": result.accuracy,
+                "avg_processing_time": result.processing_time,
+                "examples_tested": result.examples_tested
+            }
+            comparison["systems"].append(system_info)
+        
+        # Rankings
+        comparison["accuracy_ranking"] = sorted(
+            results, key=lambda x: x.accuracy, reverse=True
+        )
+        comparison["speed_ranking"] = sorted(
+            results, key=lambda x: x.processing_time
+        )
+        
+        # Best system for each contradiction type
+        all_types = set()
+        for result in results:
+            all_types.update(result.precision_by_type.keys())
+            all_types.update(result.recall_by_type.keys())
+        
+        for ctype in all_types:
+            best_precision = max(results, 
+                               key=lambda x: x.precision_by_type.get(ctype, 0.0))
+            best_recall = max(results,
+                            key=lambda x: x.recall_by_type.get(ctype, 0.0))
+            
+            comparison["best_by_type"][ctype] = {
+                "best_precision": {
+                    "system": best_precision.system_name,
+                    "score": best_precision.precision_by_type.get(ctype, 0.0)
+                },
+                "best_recall": {
+                    "system": best_recall.system_name,
+                    "score": best_recall.recall_by_type.get(ctype, 0.0)
+                }
+            }
+        
+        return comparison
+    
+    def export_benchmark_results(self, output_path: str) -> None:
+        """Export all benchmark results to JSON file."""
+        results_data = {
+            "benchmark_results": [asdict(result) for result in self.benchmark_results],
+            "export_timestamp": time.time(),
+            "total_systems_tested": len(self.benchmark_results)
+        }
+        
+        with open(output_path, 'w') as f:
+            json.dump(results_data, f, indent=2)
+
+
+# Convenience functions for easy usage
+def create_training_data_from_logs(learning_log_paths: List[str], 
+                                 output_dir: str = "training_data") -> None:
+    """
+    Convenience function to create training data from multiple learning logs.
+    
+    Args:
+        learning_log_paths: List of paths to learning log files
+        output_dir: Directory to save training data files
+    """
+    Path(output_dir).mkdir(exist_ok=True)
+    
+    generator = ContradictionTrainingDataGenerator()
+    
+    # Process all learning logs
+    for log_path in learning_log_paths:
+        print(f"Processing {log_path}...")
+        generator.process_learning_log(log_path)
+    
+    print(f"Generated {len(generator.training_examples)} training examples")
+    
+    # Generate synthetic examples
+    synthetic = generator.generate_synthetic_examples(generator.training_examples, count=200)
+    print(f"Generated {len(synthetic)} synthetic examples")
+    
+    # Export in multiple formats
+    generator.export_for_openai_finetuning(f"{output_dir}/openai_chat_format.jsonl", "chat")
+    generator.export_for_anthropic_training(f"{output_dir}/anthropic_format.json")
+    generator.export_for_generic_training(f"{output_dir}/training_data.csv", "csv")
+    generator.export_for_generic_training(f"{output_dir}/training_data.json", "json")
+    
+    # Create difficulty splits
+    splits = generator.create_difficulty_split()
+    for split_name, examples in splits.items():
+        with open(f"{output_dir}/{split_name}_examples.json", 'w') as f:
+            json.dump([asdict(ex) for ex in examples], f, indent=2)
+    
+    print(f"Training data exported to {output_dir}/")
+    print("Ready for AI system training!")
+
+
+def benchmark_against_mbt(mbt_results_path: str, 
+                         ai_prediction_function: callable,
+                         system_name: str,
+                         system_version: str = "1.0") -> AIBenchmarkResult:
+    """
+    Benchmark an AI system against MBT gold standard results.
+    
+    Args:
+        mbt_results_path: Path to MBT results file
+        ai_prediction_function: Function that predicts contradiction types
+        system_name: Name of the AI system being tested
+        system_version: Version of the AI system
+        
+    Returns:
+        Benchmark results
+    """
+    # Load MBT results as ground truth
+    with open(mbt_results_path, 'r') as f:
+        mbt_data = json.load(f)
+    
+    # Convert to training examples
+    test_examples = []
+    for result in mbt_data.get('results', []):
+        if result.get('status') == 'cycle_complete':
+            contradiction = result['contradiction']
+            example = TrainingExample(
+                id=result['claim_id'],
+                premise=contradiction.get('premise', ''),
+                query=contradiction.get('query', ''),
+                contradiction_type=contradiction['type'],
+                explanation=contradiction.get('note', ''),
+                human_patch="",
+                repair_action="",
+                domain=contradiction.get('domain', 'unknown'),
+                difficulty_level=3
+            )
+            test_examples.append(example)
+    
+    # Run benchmark
+    benchmarker = AISystemBenchmarker()
+    benchmarker.load_test_suite(test_examples)
+    
+    result = benchmarker.benchmark_ai_system(
+        system_name, system_version, ai_prediction_function, test_examples
+    )
+    
+    print(f"\n🧠 Benchmark Results for {system_name} v{system_version}")
+    print(f"Accuracy: {result.accuracy:.2%}")
+    print(f"Processing time: {result.processing_time:.4f}s per example")
+    print(f"Examples tested: {result.examples_tested}")
+    
+    return result
