@@ -1,0 +1,236 @@
+#!/usr/bin/env python3
+"""
+AI Training Tools for Contradiction Detection
+Helps train ChatGPT, Claude, and other AI systems on contradiction handling
+"""
+
+import json
+import csv
+import random
+from typing import List, Dict, Any, Optional, Tuple
+from dataclasses import dataclass, asdict
+from pathlib import Path
+
+from ..core.types import Contradiction, LearningEvent, ContradictionType
+
+
+@dataclass
+class TrainingExample:
+    """A single training example for AI systems."""
+    id: str
+    premise: str
+    query: str
+    contradiction_type: str
+    explanation: str
+    human_patch: str
+    repair_action: str
+    domain: str
+    difficulty_level: int  # 1-5 scale
+    
+    
+@dataclass  
+class AIBenchmarkResult:
+    """Results from testing an AI system on contradiction detection."""
+    system_name: str
+    version: str
+    test_date: str
+    accuracy: float
+    precision_by_type: Dict[str, float]
+    recall_by_type: Dict[str, float]
+    processing_time: float
+    examples_tested: int
+    
+
+class ContradictionTrainingDataGenerator:
+    """
+    Generates training data for AI systems from recursive loop results.
+    Supports multiple export formats for different AI training pipelines.
+    """
+    
+    def __init__(self):
+        self.training_examples = []
+        self.ai_benchmark_results = []
+        
+    def process_learning_log(self, learning_log_path: str) -> List[TrainingExample]:
+        """
+        Convert recursive AGI learning log into training examples.
+        
+        Args:
+            learning_log_path: Path to the learning log JSON file
+            
+        Returns:
+            List of training examples
+        """
+        with open(learning_log_path, 'r') as f:
+            log_data = json.load(f)
+        
+        examples = []
+        learning_events = log_data.get('learning_events', [])
+        
+        # Group events by contradiction
+        contradictions = {}
+        patches = {}
+        
+        for event in learning_events:
+            if event['event_type'] == 'contradiction_detection':
+                claim_id = event['data'].get('claim_id')
+                contradictions[claim_id] = event['data']
+            elif event['event_type'] == 'patch_application':
+                contradiction_id = event['data'].get('contradiction_id')
+                patches[contradiction_id] = event['data']
+        
+        # Create training examples
+        for claim_id, contradiction_data in contradictions.items():
+            patch_data = patches.get(f"contradiction_{hash(claim_id)}", {})
+            
+            example = TrainingExample(
+                id=claim_id,
+                premise=contradiction_data.get('premise', ''),
+                query=contradiction_data.get('query', ''),
+                contradiction_type=contradiction_data.get('type', ''),
+                explanation=contradiction_data.get('note', ''),
+                human_patch=patch_data.get('human_insight', ''),
+                repair_action=patch_data.get('repair_action', ''),
+                domain=contradiction_data.get('domain', 'unknown'),
+                difficulty_level=self._assess_difficulty(contradiction_data)
+            )
+            examples.append(example)
+        
+        self.training_examples.extend(examples)
+        return examples
+    
+    def export_for_openai_finetuning(self, output_path: str, 
+                                   format_type: str = 'chat') -> None:
+        """
+        Export training data in OpenAI fine-tuning format.
+        
+        Args:
+            output_path: Path to save the training file
+            format_type: 'chat' or 'completion' format
+        """
+        training_data = []
+        
+        for example in self.training_examples:
+            if format_type == 'chat':
+                # Chat format for GPT-3.5-turbo and GPT-4
+                entry = {
+                    "messages": [
+                        {
+                            "role": "system",
+                            "content": "You are an expert at detecting logical contradictions. Analyze the premise and query to identify contradiction types: Type I (Direct Negation), Type II (Property Mismatch), Type III (Definitional Violation), Type IV (Counterexample to Universal), or None."
+                        },
+                        {
+                            "role": "user", 
+                            "content": f"Premise: {example.premise}\nQuery: {example.query}\n\nWhat type of contradiction is this?"
+                        },
+                        {
+                            "role": "assistant",
+                            "content": f"This is a {example.contradiction_type}. {example.explanation}\n\nSuggested repair: {example.repair_action}"
+                        }
+                    ]
+                }
+            else:
+                # Completion format for older models
+                entry = {
+                    "prompt": f"Premise: {example.premise}\nQuery: {example.query}\nContradiction type:",
+                    "completion": f" {example.contradiction_type}. {example.explanation}"
+                }
+            
+            training_data.append(entry)
+        
+        with open(output_path, 'w') as f:
+            for entry in training_data:
+                f.write(json.dumps(entry) + '\n')
+    
+    def export_for_anthropic_training(self, output_path: str) -> None:
+        """
+        Export training data optimized for Anthropic Claude training.
+        Uses Constitutional AI principles and detailed reasoning.
+        """
+        training_data = []
+        
+        for example in self.training_examples:
+            # Anthropic format emphasizes reasoning and helpfulness
+            entry = {
+                "human": f"""I need help analyzing this logical statement for contradictions:
+
+Premise: {example.premise}
+Query: {example.query}
+Domain: {example.domain}
+
+Please identify if there's a logical contradiction and explain your reasoning step by step.""",
+                
+                "assistant": f"""I'll analyze this step by step for logical contradictions:
+
+**Analysis:**
+1. **Premise examination**: {example.premise}
+2. **Query examination**: {example.query}
+3. **Domain context**: {example.domain}
+
+**Contradiction Detection:**
+This represents a **{example.contradiction_type}**.
+
+**Reasoning:**
+{example.explanation}
+
+**Human Expert Insight:**
+{example.human_patch}
+
+**Suggested Repair Strategy:**
+{example.repair_action}
+
+This type of contradiction is important to catch because it can lead to logical inconsistencies in reasoning systems. The repair strategy addresses the core issue while preserving the intended meaning."""
+            }
+            training_data.append(entry)
+        
+        with open(output_path, 'w') as f:
+            json.dump(training_data, f, indent=2)
+    
+    def export_for_generic_training(self, output_path: str, format: str = 'csv') -> None:
+        """
+        Export in generic format for any AI training pipeline.
+        
+        Args:
+            output_path: Path to save file
+            format: 'csv', 'json', or 'tsv'
+        """
+        if format == 'csv':
+            with open(output_path, 'w', newline='') as f:
+                writer = csv.writer(f)
+                writer.writerow([
+                    'id', 'premise', 'query', 'contradiction_type', 'explanation',
+                    'human_patch', 'repair_action', 'domain', 'difficulty_level'
+                ])
+                
+                for example in self.training_examples:
+                    writer.writerow([
+                        example.id, example.premise, example.query,
+                        example.contradiction_type, example.explanation,
+                        example.human_patch, example.repair_action,
+                        example.domain, example.difficulty_level
+                    ])
+        
+        elif format == 'json':
+            with open(output_path, 'w') as f:
+                json.dump([asdict(example) for example in self.training_examples], 
+                         f, indent=2)
+        
+        elif format == 'tsv':
+            with open(output_path, 'w') as f:
+                f.write('\t'.join([
+                    'id', 'premise', 'query', 'contradiction_type', 'explanation',
+                    'human_patch', 'repair_action', 'domain', 'difficulty_level'
+                ]) + '\n')
+                
+                for example in self.training_examples:
+                    f.write('\t'.join([
+                        str(getattr(example, field)) for field in [
+                            'id', 'premise', 'query', 'contradiction_type', 'explanation',
+                            'human_patch', 'repair_action', 'domain', 'difficulty_level'
+                        ]
+                    ]) + '\n')
+    
+    def generate_synthetic_examples(self, base_examples: List[TrainingExample], 
+                                  count: int = 100) -> List[TrainingExample]:
+        """
+        Generate synthetic training examples through
