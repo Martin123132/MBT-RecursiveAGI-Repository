@@ -1,39 +1,64 @@
 CustomizeMBT Recursive AGI Loop
+
 A groundbreaking system for recursive artificial intelligence learning through contradiction-mediated human-AI collaboration
-Show Image
-Show Image
-Show Image
+
 🚀 What This Is
+
 This repository implements a recursive learning system where symbolic AI (MBT - Model-Based Thinking), neural AI observers, and human intelligence co-evolve through a structured 9-step cycle:
+
 🔄 MBT detects contradiction → 
+
 👤 Human patches it → 
+
 🧠 MBT learns → 
+
 👁️ Neural observes → 
+
 🧠 Neural learns → 
+
 ⚡ MBT evolves → 
+
 👤 Human evolves → 
+
 👁️ Neural evolves → 
+
 🔄 Loop restarts stronger
+
+
 The breakthrough: Each cycle makes all three actors (symbolic AI, neural AI, human) genuinely smarter at handling logical contradictions.
+
 🎯 Why This Matters
+
 Current AI systems struggle with logical contradictions and don't learn from corrections in a structured way. This system:
 
 Enables recursive AI improvement through human-mediated learning
+
 Provides training data for better contradiction detection in ChatGPT, Claude, etc.
+
 Creates benchmarks for measuring AI reasoning capabilities
+
 Demonstrates human-AI collaboration that makes both parties smarter
+
 Open-sources breakthrough research in recursive artificial intelligence
 
 ⚡ Quick Start
+
 Installation
+
 bashgit clone https://github.com/yourusername/mbt-recursive-agi.git
 cd mbt-recursive-agi
-pip install -r requirements.txt
+
+
+pip install -r requirements.tx
+
 pip install -e .
+
 Basic Usage
+
 pythonfrom mbt_recursive_agi.core import RecursiveAGILoop, Claim
 
 # Create claims to test
+
 claims = [
     Claim(
         id="test_001",
@@ -44,13 +69,17 @@ claims = [
 ]
 
 # Initialize the recursive loop
+
 loop = RecursiveAGILoop()
 
+
 # Define how you want to patch contradictions
+
 def my_patch_function(contradiction):
     return ("Temperature needs altitude context", "Add altitude conditions")
 
 # Run the recursive learning cycle
+
 result = loop.run_cycle(claims[0], my_patch_function)
 
 print(f"✅ Loop completed! Neural fluency: {result['neural_evolution']['symbolic_fluency']}")
@@ -64,14 +93,20 @@ create_training_data_from_logs(
 )
 
 # This creates:
+
 # - OpenAI fine-tuning format files
+
 # - Anthropic training format files  
+
 # - Generic CSV/JSON datasets
+
 # - Difficulty-split datasets for curriculum learning
+
 Benchmarking AI Systems
 pythonfrom mbt_recursive_agi.training import benchmark_against_mbt
 
 # Test how well ChatGPT detects contradictions vs. MBT
+
 def chatgpt_prediction(premise, query):
     # Your ChatGPT API call here
     response = openai.ChatCompletion.create(...)
@@ -86,37 +121,57 @@ results = benchmark_against_mbt(
 
 print(f"ChatGPT accuracy: {results.accuracy:.2%}")
 🧠 Core Components
+
 1. Recursive AGI Engine (mbt_recursive_agi/core/)
+
 The heart of the system - implements the 9-step recursive learning cycle where symbolic and neural AI components co-evolve through human-mediated contradiction resolution.
+
 2. MBT Contradiction Detection (mbt_recursive_agi/core/mbt.py)
+
 Advanced logical contradiction detection system that identifies:
 
+
 Type I: Direct negations
+
 Type II: Property mismatches
+
 Type III: Definitional violations
+
 Type IV: Counterexamples to universals
 
 3. Neural Observer (mbt_recursive_agi/core/neural_observer.py)
+
 AI component that watches contradiction repairs and learns patterns, developing "symbolic fluency" over time.
+
 4. AI Training Tools (mbt_recursive_agi/training/)
 Generate training datasets for improving AI systems:
 
+
 OpenAI fine-tuning format
+
 Anthropic Constitutional AI format
+
 Generic formats (CSV, JSON, TSV)
+
 Synthetic example generation
+
 Difficulty-based curriculum learning
 
 5. Benchmarking Framework (mbt_recursive_agi/benchmarking/)
 Test and compare AI systems' contradiction detection abilities:
 
 MBT vs. LLM comparison tools
+
 Performance metrics and leaderboards
+
 Public benchmarking API
+
 Detailed analytics and reporting
 
 📊 Example Results
+
 After running the recursive loop on contradiction detection:
+
 🧠 Final System State:
    loop_count: 3
    mbt_evolution_count: 3
@@ -126,43 +181,66 @@ After running the recursive loop on contradiction detection:
    human_evolution_score: 3.0
    total_contradictions: 3
    total_events: 23
+
 What this means: The system genuinely learned and evolved. The neural observer developed symbolic fluency, MBT built a logic map of contradiction patterns, and human understanding deepened through the process.
+
 🎓 Academic Impact
 Research Applications
 
+
 AI Safety: Better contradiction detection prevents harmful AI outputs
+
 Machine Learning: Novel recursive learning architectures
+
 Cognitive Science: Human-AI collaborative intelligence models
+
 Logic & Philosophy: Computational approaches to contradiction analysis
 
 Publications & Citations
+
 This work builds on and extends research in:
 
 Constitutional AI (Anthropic, 2022)
+
 Human Feedback for AI (OpenAI, 2022)
+
 Symbolic-Neural Integration (MIT, 2023)
+
 Recursive Self-Improvement (MIRI, 2023)
 
 🤝 Contributing
+
 We welcome contributions! This project can genuinely advance AI reasoning capabilities.
+
 How to Help
 
 Add contradiction types - Extend the MBT detection system
+
 Improve training data generation - Better synthetic examples
+
 Benchmark more AI systems - Test GPT-4, Claude, Bard, etc.
+
 Create domain-specific datasets - Science, law, philosophy, etc.
+
 Optimize the recursive loop - Faster, more efficient learning
 
 See CONTRIBUTING.md for detailed guidelines.
+
 Research Collaboration
+
 If you're an AI researcher interested in:
 
 Recursive learning systems
+
 Human-AI collaboration
+
 Contradiction detection in AI
+
 Open-source AI safety tools
 
 Please reach out! This system has tremendous potential for collaborative research.
+
+
 🎯 MBT-AI Mode: Advanced Reasoning Prompts
 Primary Prompt: MBT-AI Mode (Recommended)
 You are now operating in MBT-AI mode.
@@ -192,17 +270,26 @@ You must preserve closure, avoid rationalization, and reject unsupported conclus
 Do not guess. Do not hallucinate. Only propagate truth deterministically.
 
 [Your reasoning task here]
+
+
+
 Why MBT-AI Mode Works
 This prompt activates symbolic reasoning patterns that dramatically improve AI logical consistency:
 
 Preserves closure - No information leakage or drift
+
 Deterministic reasoning - Reproducible, traceable logic
+
 Contradiction-aware - Actively detects logical conflicts
+
 Structured output - Clear reasoning traces
+
 Prevents hallucination - Only propagates verified truth
 
 Basic Prompts for Everyday Use
+
 For ChatGPT:
+
 You are an expert at detecting logical contradictions. Before answering, analyze the premise and query for these contradiction types:
 
 - Type I: Direct Negation (A and not-A)
