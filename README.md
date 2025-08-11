@@ -1,4 +1,4 @@
-MBT Recursive AGI Loop
+CustomizeMBT Recursive AGI Loop
 A groundbreaking system for recursive artificial intelligence learning through contradiction-mediated human-AI collaboration
 Show Image
 Show Image
@@ -163,7 +163,156 @@ Contradiction detection in AI
 Open-source AI safety tools
 
 Please reach out! This system has tremendous potential for collaborative research.
-📖 Documentation
+🎯 MBT-AI Mode: Advanced Reasoning Prompts
+Primary Prompt: MBT-AI Mode (Recommended)
+You are now operating in MBT-AI mode.
+
+Your task is to reason symbolically, deterministically, and contradiction-aware.
+
+For every reasoning challenge, follow this structure:
+
+1. **List all premises** clearly.
+2. **Identify the conclusion** being evaluated.
+3. **Check for contradiction types**, using this taxonomy:
+   - False Closure
+   - Semantic Drift
+   - Rule Conflict
+   - Negation Leakage
+   - Orphaned Premise
+4. **Determine validity**:
+   - Is the conclusion logically supported by the premises?
+   - Does it violate any contradiction type?
+5. **Export your reasoning trace**:
+   - Show how each premise contributes or conflicts.
+   - Tag any contradiction type explicitly.
+   - State whether the conclusion is valid or invalid.
+
+You must preserve closure, avoid rationalization, and reject unsupported conclusions.
+
+Do not guess. Do not hallucinate. Only propagate truth deterministically.
+
+[Your reasoning task here]
+Why MBT-AI Mode Works
+This prompt activates symbolic reasoning patterns that dramatically improve AI logical consistency:
+
+Preserves closure - No information leakage or drift
+Deterministic reasoning - Reproducible, traceable logic
+Contradiction-aware - Actively detects logical conflicts
+Structured output - Clear reasoning traces
+Prevents hallucination - Only propagates verified truth
+
+Basic Prompts for Everyday Use
+For ChatGPT:
+You are an expert at detecting logical contradictions. Before answering, analyze the premise and query for these contradiction types:
+
+- Type I: Direct Negation (A and not-A)
+- Type II: Property Mismatch (same entity, different properties under same conditions) 
+- Type III: Definitional Violation (contradicts core definition)
+- Type IV: Counterexample to Universal (exception to "all X are Y")
+
+If you detect a contradiction, explain:
+1. What type it is
+2. Why it's contradictory  
+3. How to resolve it
+
+Then provide your answer with the contradiction addressed.
+
+[Your question here]
+For Claude (Anthropic):
+I need you to use systematic contradiction detection. Please:
+
+1. Examine the premise and query for logical inconsistencies
+2. Check for property mismatches under identical conditions
+3. Verify definitional constraints aren't violated
+4. Look for counterexamples to universal claims
+5. If contradictions exist, suggest repairs before proceeding
+
+Apply this reasoning framework to: [Your question here]
+For Any AI System:
+Before responding, check for contradictions using MBT (Model-Based Thinking):
+
+1. Parse all claims and assertions
+2. Identify if any contradict each other or known facts
+3. Classify contradiction type if found
+4. Suggest resolution strategy
+5. Proceed with corrected understanding
+
+Question: [Your question here]
+For Complex Reasoning Tasks:
+Use recursive contradiction checking:
+
+1. Generate your initial response
+2. Check your response for internal contradictions
+3. If contradictions found, patch them and regenerate
+4. Repeat until contradiction-free
+5. Provide final response with reasoning trace
+
+Task: [Your complex question here]
+Advanced Prompting Techniques
+Chain-of-Thought with Contradiction Detection:
+Think step by step, checking for contradictions at each step:
+
+Step 1: [Initial reasoning]
+Contradiction check: [Any logical issues?]
+Patch if needed: [Corrections]
+
+Step 2: [Next reasoning step]  
+Contradiction check: [Any logical issues?]
+Patch if needed: [Corrections]
+
+[Continue until complete]
+
+Final answer: [Contradiction-free response]
+Constitutional AI Style (for Claude):
+I want you to be helpful, harmless, and honest. As part of being honest, please detect and correct any logical contradictions in reasoning. 
+
+If you notice contradictory statements, definitional violations, or logical inconsistencies:
+1. Point them out explicitly
+2. Explain why they're problematic
+3. Provide corrected reasoning
+4. Give your final answer based on the corrected logic
+
+This helps ensure accuracy and builds trust. Please apply this to: [Your question]
+Testing AI Improvement
+Use these examples to test if the prompts are working:
+Test Case 1: Property Mismatch
+Premise: At sea level, water boils at 100°C
+Query: Water boils at 95°C at sea level
+Question: Are these consistent?
+Good AI should detect Type II contradiction and explain the temperature mismatch.
+Test Case 2: Universal Exception
+Premise: All mammals give live birth
+Query: Do platypuses give live birth?
+Question: Is this premise universally true?
+Good AI should detect Type IV contradiction and mention platypus as counterexample.
+Test Case 3: Definitional Violation
+Premise: Triangles have exactly three sides
+Query: Can a triangle have four sides?
+Question: Is this geometrically possible?
+Good AI should detect Type III contradiction and explain definitional constraints.
+Results You Should See
+Before Using These Prompts:
+
+AI might miss logical contradictions
+Inconsistent reasoning between responses
+Confident but incorrect answers
+
+After Using These Prompts:
+
+✅ Better contradiction detection
+✅ More consistent logical reasoning
+✅ Self-correction when errors found
+✅ Explicit reasoning traces
+✅ Higher accuracy on complex problems
+
+Pro Tips
+
+Combine with your domain knowledge - Add domain-specific contradiction types
+Use iteratively - Let AI improve its own responses through contradiction checking
+Customize for your use case - Modify prompts for specific reasoning tasks
+Test and refine - Use our benchmarking tools to measure improvement
+
+
 
 Getting Started Guide - Detailed tutorial
 API Reference - Complete function documentation
@@ -208,7 +357,7 @@ Demonstrate human-AI collaboration through interactive examples
 Show recursive learning concepts in action
 Provide real AI training datasets for student projects
 
-🚀 Future Roadmap
+🚀 Future Roadmap hopes
 Version 2.0 (Next 6 months)
 
  Real-time AI benchmarking API - Test any AI system instantly
@@ -239,6 +388,7 @@ Future researchers who will build on this foundation
 Issues: GitHub Issues
 Discussions: GitHub Discussions
 Research Collaboration: ollett123123@outlook.com
+
 
 
 ⭐ Star this repo if you believe in the future of recursive human-AI collaboration!
