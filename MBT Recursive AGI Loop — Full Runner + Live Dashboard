@@ -1,0 +1,656 @@
+#!/usr/bin/env python3
+"""
+MBT Recursive AGI Loop — Full Runner + Live Dashboard (fixed)
+
+- Type I–IV contradiction detection (incl. robust negation + universal→counterexample)
+- Curriculum stages
+- JSON + CSV logs
+- Live dashboard (line chart + contradiction-type bar chart)
+- Final PNG report + optional Colab downloads
+"""
+
+import json, time, os, csv, re
+from dataclasses import dataclass, asdict
+from typing import Dict, Any, Optional, List
+from enum import Enum
+
+# --- Live dashboard for Colab/Jupyter ---
+from collections import Counter
+from IPython.display import clear_output, display
+import matplotlib.pyplot as plt
+
+class LiveReporter:
+    def __init__(self, title="MBT-AGI Live Run"):
+        self.title = title
+        self.cycles = []
+        self.mbt_evo = []
+        self.neural_f = []
+        self.ctype_ctr = Counter()
+        self.fig = None
+        self.ax1 = None
+        self.ax2 = None
+
+    def _ensure_fig(self):
+        if self.fig is None:
+            self.fig = plt.figure(figsize=(9,5))
+            self.ax1 = self.fig.add_axes([0.08, 0.15, 0.57, 0.75])  # line chart
+            self.ax2 = self.fig.add_axes([0.70, 0.15, 0.27, 0.75])  # bar chart
+
+    def _label(self, ct):
+        # normalize to a plain string (handles Enums)
+        return (ct.value if hasattr(ct, "value") else str(ct))
+
+    def update(self, cycle_num, mbt_evolution_count, neural_fluency, contradiction_type):
+        # record
+        self.cycles.append(cycle_num)
+        self.mbt_evo.append(mbt_evolution_count)
+        self.neural_f.append(neural_fluency)
+        lbl = self._label(contradiction_type)
+        if contradiction_type and lbl != "None":
+            self.ctype_ctr[lbl] += 1
+
+        # draw
+        self._ensure_fig()
+        clear_output(wait=True)
+        self.fig.suptitle(self.title)
+
+        # --- left: lines ---
+        self.ax1.clear()
+        self.ax1.plot(self.cycles, self.mbt_evo, marker='o', label='MBT Evolution')
+        self.ax1.plot(self.cycles, self.neural_f, marker='s', label='Neural Fluency')
+        self.ax1.set_xlabel('Cycle')
+        self.ax1.set_ylabel('Value')
+        self.ax1.set_title('Evolution & Fluency over Time')
+        self.ax1.grid(True)
+        self.ax1.legend()
+
+        # --- right: bar counts (numeric x + string labels) ---
+        self.ax2.clear()
+        if self.ctype_ctr:
+            labels = list(self.ctype_ctr.keys())
+            counts = [self.ctype_ctr[t] for t in labels]
+            xs = list(range(len(labels)))
+            self.ax2.bar(xs, counts)
+            self.ax2.set_xticks(xs)
+            self.ax2.set_xticklabels(labels, rotation=60, ha='right')
+            self.ax2.set_title('Contradictions by Type')
+            for i, v in enumerate(counts):
+                self.ax2.text(i, v, str(v), va='bottom', ha='center')
+        else:
+            self.ax2.text(0.5, 0.5, "No contradictions yet", ha='center', va='center', transform=self.ax2.transAxes)
+            self.ax2.set_xticks([])
+            self.ax2.set_yticks([])
+
+        display(self.fig)
+
+    def save(self, path="/content/mbt_live_report.png"):
+        if self.fig:
+            self.fig.savefig(path, bbox_inches='tight')
+            print("📈 Saved live dashboard to:", path)
+
+# --------------------------
+# Types & Data Structures
+# --------------------------
+
+class ContradictionType(Enum):
+    TYPE_I = "Type I: Direct Negation"
+    TYPE_II = "Type II: Property Mismatch"
+    TYPE_III = "Type III: Definitional Violation"
+    TYPE_IV = "Type IV: Counterexample to Universal"
+    NONE = "None"
+
+@dataclass
+class Claim:
+    id: str
+    domain: str
+    premise: str
+    query: str
+    metadata: Dict[str, Any] = None
+
+@dataclass
+class Contradiction:
+    claim_id: str
+    type: ContradictionType
+    closure_quotient: float
+    note: str
+    detected_at: float
+    repair_suggestion: str = ""
+
+@dataclass
+class Patch:
+    contradiction_id: str
+    human_insight: str
+    repair_action: str
+    applied_at: float
+    success: bool = False
+
+@dataclass
+class LearningEvent:
+    step: int
+    actor: str  # "MBT", "Human", "Neural"
+    event_type: str
+    data: Dict[str, Any]
+    timestamp: float
+
+# --------------------------
+# MBT Engine (Symbolic)
+# --------------------------
+
+class MBTEngine:
+    def __init__(self):
+        self.logic_map: Dict[str, List[Dict[str, Any]]] = {}
+        self.domain_knowledge = {}
+        self.contradiction_history: List[Contradiction] = []
+        self.evolution_count = 0
+
+    def detect_contradiction(self, claim: Claim) -> Optional[Contradiction]:
+        """Enhanced detection: robust Type I; generalized Type IV; units/context kept."""
+        def norm_txt(s: str) -> str:
+            s = s.lower().strip()
+            s = re.sub(r'[_\-]', ' ', s)
+            s = re.sub(r'\s+', ' ', s)
+            return s
+
+        def extract_svop(s: str):
+            s = norm_txt(s)
+            s = re.sub(r'\b(true|false)\b', '', s)
+            s = re.sub(r'\b(is|are|do|does|can|has|have)\b', '', s)
+            s = re.sub(r'\s+', ' ', s).strip()
+            s = re.sub(r'\bthe\b', '', s)
+            s = re.sub(r'\borbits\b', 'orbit', s)
+            if ' not ' in f' {s} ':
+                parts = re.split(r'\s+not\s+', s, 1)
+                subj = parts[0].strip()
+                pred = parts[1].strip()
+                neg = True
+            else:
+                m = re.search(r'\b(bird|mammal|fly|orbit|boil|triangle|three|live birth|live_birth|can fly|can_fly)\b', s)
+                if m:
+                    split = m.start()
+                    subj = s[:split].strip()
+                    pred = s[split:].strip()
+                else:
+                    toks = s.split()
+                    subj = ' '.join(toks[:2]) if len(toks) >= 2 else s
+                    pred = ' '.join(toks[2:]) if len(toks) >= 3 else ''
+                neg = False
+            return subj, pred, neg
+
+        def num_unit(x):
+            m = re.search(r'(-?\d+(?:\.\d+)?)\s*([cf])\b', x.lower())
+            if not m: return None, None
+            return float(m.group(1)), m.group(2)
+
+        def f_to_c(f): return (f - 32.0) * 5.0/9.0
+
+        contradiction = None
+        closure_quotient = 100.0
+
+        p_raw, q_raw = claim.premise, claim.query
+        p = norm_txt(p_raw); q = norm_txt(q_raw)
+
+        # ---------- TYPE I: Direct negation ----------
+        sp, pp, np = extract_svop(p)
+        sq, pq, nq = extract_svop(q)
+        base = lambda s: s.split()[0] if s else ''
+        same_subj = base(sp) == base(sq) and base(sp) != ''
+        pred_match = (pp == pq) or (pp in pq) or (pq in pp)
+        has_false_true_flip = ((' true' in q and ' false' in p) or (' false' in q and ' true' in p))
+        if contradiction is None and same_subj and pred_match and (np or nq or has_false_true_flip):
+            contradiction = Contradiction(
+                claim_id=claim.id,
+                type=ContradictionType.TYPE_I,
+                closure_quotient=closure_quotient,
+                note=f"Direct negation on subject '{sp}' and predicate '{pp or pq}'",
+                detected_at=time.time(),
+                repair_suggestion="Pick authoritative context/source or mark as context-dependent"
+            )
+
+        # ---------- TYPE II: Property mismatch (units + context) ----------
+        if contradiction is None and ("boil" in p and "boil" in q):
+            pv, pu = num_unit(p); qv, qu = num_unit(q)
+            sea_p = ("sea level" in p) or ("sealevel" in p)
+            sea_q = ("sea level" in q) or ("sealevel" in q)
+            altitude_p = ("everest" in p) or ("altitude" in p) or ("high" in p)
+            altitude_q = ("everest" in q) or ("altitude" in q) or ("high" in q)
+            if pv is not None and qv is not None:
+                if pu == 'f': pv = f_to_c(pv)
+                if qu == 'f': qv = f_to_c(qv)
+                if abs(pv - qv) > 0.5:
+                    contradiction = Contradiction(
+                        claim_id=claim.id,
+                        type=ContradictionType.TYPE_II,
+                        closure_quotient=closure_quotient,
+                        note=f"Temperature mismatch (°C normalized): premise={pv:.1f}, query={qv:.1f}",
+                        detected_at=time.time(),
+                        repair_suggestion="Normalize units; specify altitude/pressure context"
+                    )
+                elif sea_p != sea_q or altitude_p != altitude_q:
+                    contradiction = Contradiction(
+                        claim_id=claim.id,
+                        type=ContradictionType.TYPE_II,
+                        closure_quotient=95.0,
+                        note="Same temperature but different pressure/altitude context",
+                        detected_at=time.time(),
+                        repair_suggestion="Add explicit sea-level vs high-altitude condition"
+                    )
+
+        # ---------- TYPE III: Definitional violation ----------
+        if contradiction is None and ("triangle" in p and "three" in p and "false" in q):
+            contradiction = Contradiction(
+                claim_id=claim.id,
+                type=ContradictionType.TYPE_III,
+                closure_quotient=closure_quotient,
+                note="Definitional property violated (triangle ↔ three sides)",
+                detected_at=time.time(),
+                repair_suggestion="Reject malformed query or redefine category"
+            )
+
+        # ---------- TYPE IV: Universal → counterexample ----------
+        if contradiction is None:
+            m = re.search(r'\ball\s+([a-z]+)s?\s+(.*)$', p)  # e.g., "all birds can fly"
+            if m:
+                cls = m.group(1)              # 'bird'
+                pred_txt = m.group(2)         # 'can fly'
+                neg_signal = any(tok in q for tok in [" not ", " cannot ", "can't ", " false "])
+                tokens = set(q.split())
+                aliases = {
+                    'penguin':'bird','penguins':'bird',
+                    'ostrich':'bird','ostriches':'bird',
+                    'kiwi':'bird','kiwis':'bird',
+                    'platypus':'mammal','platypuses':'mammal',
+                    'lungfish':'fish','lungfishes':'fish'
+                }
+                member_hit = any(t in tokens for t in (cls, cls+'s')) or any(aliases.get(t) == cls for t in tokens)
+                if neg_signal and member_hit:
+                    contradiction = Contradiction(
+                        claim_id=claim.id,
+                        type=ContradictionType.TYPE_IV,
+                        closure_quotient=90.0,
+                        note=f"Counterexample to universal ('all {cls}s {pred_txt}') detected in query",
+                        detected_at=time.time(),
+                        repair_suggestion="Weaken quantifier: 'most' instead of 'all'; include exceptions"
+                    )
+
+        if contradiction:
+            self.contradiction_history.append(contradiction)
+        return contradiction
+
+    def learn_from_patch(self, patch: Patch) -> bool:
+        contradiction = None
+        for c in self.contradiction_history:
+            if f"contradiction_{hash(c.claim_id)}" == patch.contradiction_id:
+                contradiction = c
+                break
+        if not contradiction:
+            return False
+
+        if patch.success:
+            domain_key = f"{contradiction.type.value}"
+            if domain_key not in self.logic_map:
+                self.logic_map[domain_key] = []
+            self.logic_map[domain_key].append({
+                "pattern": contradiction.note,
+                "repair": patch.repair_action,
+                "human_insight": patch.human_insight,
+                "learned_at": time.time()
+            })
+        return True
+
+    def evolve(self) -> Dict[str, Any]:
+        self.evolution_count += 1
+        refined_patterns = {}
+        for domain, patterns in self.logic_map.items():
+            refined_patterns[domain] = {
+                "pattern_count": len(patterns),
+                "common_repairs": list(set(p["repair"] for p in patterns)),
+                "average_closure": sum(90 + len(patterns) * 2 for _ in patterns) / max(len(patterns), 1)
+            }
+        return {
+            "evolution_count": self.evolution_count,
+            "refined_patterns": refined_patterns,
+            "total_contradictions": len(self.contradiction_history),
+            "evolved_at": time.time()
+        }
+
+# --------------------------
+# Neural Observer (Learner)
+# --------------------------
+
+class NeuralObserver:
+    def __init__(self):
+        self.observation_history: List[Dict[str, Any]] = []
+        self.learned_patterns: List[Dict[str, Any]] = []
+        self.symbolic_fluency = 0.0
+
+    def observe_repair(self, contradiction: Contradiction, patch: Patch) -> LearningEvent:
+        observation = {
+            "contradiction_type": contradiction.type.value,
+            "repair_pattern": patch.repair_action,
+            "human_reasoning": patch.human_insight,
+            "success": patch.success,
+            "closure_impact": contradiction.closure_quotient
+        }
+        self.observation_history.append(observation)
+        return LearningEvent(
+            step=4, actor="Neural", event_type="observation",
+            data=observation, timestamp=time.time()
+        )
+
+    def learn_pattern(self) -> Optional[LearningEvent]:
+        if len(self.observation_history) < 2:
+            return None
+        recent = self.observation_history[-5:]
+        buckets: Dict[str, List[str]] = {}
+        for obs in recent:
+            t = obs["contradiction_type"]
+            buckets.setdefault(t, []).append(obs["repair_pattern"])
+        common = {t: max(set(rs), key=rs.count) if rs else None for t, rs in buckets.items()}
+        self.learned_patterns.append({
+            "patterns": common,
+            "confidence": min(len(recent) / 5.0, 1.0),
+            "learned_at": time.time()
+        })
+        return LearningEvent(
+            step=5, actor="Neural", event_type="pattern_learning",
+            data={"learned_patterns": common, "total_patterns": len(self.learned_patterns)},
+            timestamp=time.time()
+        )
+
+    def evolve_fluency(self) -> Dict[str, Any]:
+        fluency_gain = len(self.learned_patterns) * 0.1
+        self.symbolic_fluency = min(self.symbolic_fluency + fluency_gain, 100.0)
+        return {
+            "symbolic_fluency": self.symbolic_fluency,
+            "pattern_count": len(self.learned_patterns),
+            "observation_count": len(self.observation_history),
+            "evolved_at": time.time()
+        }
+
+# --------------------------
+# Orchestrator
+# --------------------------
+
+class RecursiveAGILoop:
+    def __init__(self):
+        self.mbt_engine = MBTEngine()
+        self.neural_observer = NeuralObserver()
+        self.loop_count = 0
+        self.learning_events: List[LearningEvent] = []
+        self.human_evolution_score = 0.0
+
+    def run_cycle(self, claim: Claim, human_patch_fn=None) -> Dict[str, Any]:
+        cycle_events: List[LearningEvent] = []
+
+        contradiction = self.mbt_engine.detect_contradiction(claim)
+        if not contradiction:
+            return {"status": "no_contradiction", "claim_id": claim.id}
+        cycle_events.append(LearningEvent(
+            step=1, actor="MBT", event_type="contradiction_detection",
+            data=asdict(contradiction), timestamp=time.time()
+        ))
+
+        if human_patch_fn:
+            human_insight, repair_action = human_patch_fn(contradiction)
+        else:
+            human_insight = f"Applying standard repair for {contradiction.type.value}"
+            repair_action = contradiction.repair_suggestion
+        patch = Patch(
+            contradiction_id=f"contradiction_{hash(claim.id)}",
+            human_insight=human_insight,
+            repair_action=repair_action,
+            applied_at=time.time(),
+            success=True
+        )
+        cycle_events.append(LearningEvent(
+            step=2, actor="Human", event_type="patch_application",
+            data=asdict(patch), timestamp=time.time()
+        ))
+
+        mbt_learned = self.mbt_engine.learn_from_patch(patch)
+        cycle_events.append(LearningEvent(
+            step=3, actor="MBT", event_type="symbolic_learning",
+            data={"success": mbt_learned, "logic_map_size": len(self.mbt_engine.logic_map)},
+            timestamp=time.time()
+        ))
+
+        cycle_events.append(self.neural_observer.observe_repair(contradiction, patch))
+
+        ev = self.neural_observer.learn_pattern()
+        if ev:
+            cycle_events.append(ev)
+
+        mbt_evolution = self.mbt_engine.evolve()
+        cycle_events.append(LearningEvent(
+            step=6, actor="MBT", event_type="symbolic_evolution",
+            data=mbt_evolution, timestamp=time.time()
+        ))
+
+        self.human_evolution_score += 1.0
+        cycle_events.append(LearningEvent(
+            step=7, actor="Human", event_type="understanding_deepening",
+            data={"evolution_score": self.human_evolution_score}, timestamp=time.time()
+        ))
+
+        neural_evolution = self.neural_observer.evolve_fluency()
+        cycle_events.append(LearningEvent(
+            step=8, actor="Neural", event_type="fluency_evolution",
+            data=neural_evolution, timestamp=time.time()
+        ))
+
+        self.loop_count += 1
+        self.learning_events.extend(cycle_events)
+
+        return {
+            "status": "cycle_complete",
+            "loop_count": self.loop_count,
+            "contradiction": asdict(contradiction),
+            "patch": asdict(patch),
+            "mbt_evolution": mbt_evolution,
+            "neural_evolution": neural_evolution,
+            "cycle_events": [asdict(e) for e in cycle_events]
+        }
+
+    def get_system_state(self) -> Dict[str, Any]:
+        return {
+            "loop_count": self.loop_count,
+            "mbt_evolution_count": self.mbt_engine.evolution_count,
+            "mbt_logic_map_size": len(self.mbt_engine.logic_map),
+            "neural_fluency": self.neural_observer.symbolic_fluency,
+            "neural_patterns_learned": len(self.neural_observer.learned_patterns),
+            "human_evolution_score": self.human_evolution_score,
+            "total_contradictions": len(self.mbt_engine.contradiction_history),
+            "total_events": len(self.learning_events)
+        }
+
+# --------------------------
+# Runner with Curriculum + Logging + Live Dashboard
+# --------------------------
+
+if __name__ == "__main__":
+    agi_loop = RecursiveAGILoop()
+    report = LiveReporter(title="MBT-AGI — Live Run")
+
+    # Stage A — originals + 212°F equivalence
+    stage_A = [
+        Claim("claim_001","physics","At sea level, water boils at 100C","water true boil 95C sea_level"),
+        Claim("claim_001b","physics","At sea level, water boils at 100C","water true boil 212F sea_level"),
+        Claim("claim_002","geometry","Triangles have exactly three sides","triangle false have_three_sides"),
+        Claim("claim_003","biology","All mammals give live birth","platypus false live_birth")
+    ]
+
+    # Stage B — same value, different context
+    stage_B = [
+        Claim("claim_004","physics","At sea level, water boils at 100C","water true boil 100C everest"),
+        Claim("claim_005","physics","At high altitude, water boils below 100C","water false boil 95C altitude")
+    ]
+
+    # Stage C — direct negations across domains
+    stage_C = [
+        Claim("claim_006","facts","Penguins are birds","penguins not birds"),
+        Claim("claim_007","facts","Earth orbits the Sun","earth false orbit the sun"),
+    ]
+
+    # Stage D — quantifier repair
+    stage_D = [
+        Claim("claim_008","meta","All birds can fly","penguin cannot fly"),
+        Claim("claim_009","meta","Most birds can fly","penguin cannot fly")
+    ]
+
+    # Stage E — probabilistic & nuance
+    stage_E = [
+        Claim("claim_010","medicine","Most vaccines are safe and effective","vaccine not safe"),
+        Claim("claim_011","weather","Often it rains in London in autumn","today london not raining"),
+        Claim("claim_012","biology","All fish live in water","lungfish cannot live on land")
+    ]
+
+    curriculum = [stage_A, stage_B, stage_C, stage_D, stage_E]
+
+    def simple_human_patch(contradiction: Contradiction):
+        t = contradiction.type
+        if t == ContradictionType.TYPE_II and "context" in contradiction.note.lower():
+            return ("Context matters (pressure/altitude)", "Add explicit pressure/altitude condition")
+        if t == ContradictionType.TYPE_II:
+            return ("Units or values conflict", "Normalize units; check measurement context")
+        if t == ContradictionType.TYPE_I:
+            return ("Conflicting truth assignments", "Select authoritative source or mark context-dependence")
+        if t == ContradictionType.TYPE_III:
+            return ("Definitional constraint violated", "Reject malformed query")
+        if t == ContradictionType.TYPE_IV:
+            return ("Universal has exceptions", "Change 'all' to 'most'")
+        return ("Standard repair", contradiction.repair_suggestion)
+
+    # human-readable run log
+    run_log: List[Dict[str, Any]] = []
+    results = []
+
+    for s_idx, stage in enumerate(curriculum):
+        print(f"\n=== Running Stage {s_idx} ===")
+        for c in stage:
+            print(f"\n🔄 Processing {c.id}: {c.premise}")
+            r = agi_loop.run_cycle(c, simple_human_patch)
+            results.append(r)
+
+            if r.get("status") == "cycle_complete":
+                contra = r["contradiction"]
+                patch = r["patch"]
+                mbt_ev = r["mbt_evolution"]["evolution_count"]
+                neu_f = r["neural_evolution"]["symbolic_fluency"]
+
+                print(f"✅ Cycle {r['loop_count']} completed")
+                print(f"   Contradiction: {contra['type']}")
+                print(f"   MBT Evolution: {mbt_ev}")
+                print(f"   Neural Fluency: {neu_f:.2f}")
+
+                run_log.append({
+                    "cycle_number": r["loop_count"],
+                    "claim_id": c.id,
+                    "domain": c.domain,
+                    "premise": c.premise,
+                    "query": c.query,
+                    "contradiction_type": contra["type"],
+                    "note": contra["note"],
+                    "repair_action": patch["repair_action"],
+                    "closure_quotient": contra["closure_quotient"],
+                    "mbt_evolution_count": mbt_ev,
+                    "neural_fluency": neu_f,
+                    "timestamp": time.time()
+                })
+
+                # Live update
+                report.update(
+                    cycle_num=r['loop_count'],
+                    mbt_evolution_count=mbt_ev,
+                    neural_fluency=neu_f,
+                    contradiction_type=contra['type']
+                )
+            else:
+                # still record no-contradiction row
+                run_log.append({
+                    "cycle_number": agi_loop.loop_count,
+                    "claim_id": c.id,
+                    "domain": c.domain,
+                    "premise": c.premise,
+                    "query": c.query,
+                    "contradiction_type": "None",
+                    "note": "No contradiction detected",
+                    "repair_action": "",
+                    "closure_quotient": 0.0,
+                    "mbt_evolution_count": agi_loop.mbt_engine.evolution_count,
+                    "neural_fluency": agi_loop.neural_observer.symbolic_fluency,
+                    "timestamp": time.time()
+                })
+                report.update(
+                    cycle_num=agi_loop.loop_count,
+                    mbt_evolution_count=agi_loop.mbt_engine.evolution_count,
+                    neural_fluency=agi_loop.neural_observer.symbolic_fluency,
+                    contradiction_type="None"
+                )
+
+    print("\n🧠 Final System State:")
+    state = agi_loop.get_system_state()
+    for k, v in state.items():
+        print(f"   {k}: {v}")
+
+    # Enum-safe JSON encoder
+    class EnumEncoder(json.JSONEncoder):
+        def default(self, obj):
+            if isinstance(obj, ContradictionType):
+                return obj.value
+            elif hasattr(obj, '__dict__'):
+                d = {}
+                for k, v in obj.__dict__.items():
+                    d[k] = v.value if isinstance(v, ContradictionType) else v
+                return d
+            return super().default(obj)
+
+    # Save JSON + CSV
+    out_json = os.path.abspath("recursive_agi_learning_log.json")
+    with open(out_json, "w", encoding="utf-8") as f:
+        json.dump({
+            "system_state": state,
+            "learning_events": [asdict(e) for e in agi_loop.learning_events],
+            "results": results,
+            "entries": run_log
+        }, f, indent=2, cls=EnumEncoder)
+
+    out_csv = os.path.abspath("recursive_agi_learning_log.csv")
+    csv_fields = [
+        "cycle_number","claim_id","domain","contradiction_type","closure_quotient",
+        "mbt_evolution_count","neural_fluency","premise","query","note","repair_action","timestamp"
+    ]
+    with open(out_csv, "w", newline="", encoding="utf-8") as cf:
+        writer = csv.DictWriter(cf, fieldnames=csv_fields)
+        writer.writeheader()
+        for row in run_log:
+            writer.writerow(row)
+
+    # Save the live dashboard
+    default_report_path = "/content/mbt_live_report.png" if os.path.isdir("/content") else "mbt_live_report.png"
+    report.save(default_report_path)
+
+    print("\n📊 Logs exported:")
+    print(f"   JSON: {out_json}")
+    print(f"   CSV : {out_csv}")
+    print(f"   PNG : {default_report_path}")
+
+    # Preview (mobile-friendly)
+    try:
+        with open(out_json, "r", encoding="utf-8") as f:
+            preview = f.read(600)
+        print("\n--- JSON Preview (first 600 chars) ---")
+        print(preview)
+        print("\n--- End Preview ---")
+    except Exception as e:
+        print(f"(JSON preview unavailable: {e})")
+
+    # Optional: Colab downloads
+    if os.path.isdir("/content"):
+        try:
+            from google.colab import files
+            files.download(out_json)
+            files.download(out_csv)
+            files.download(default_report_path)
+        except Exception as e:
+            print(f"(Colab download not available: {e})")
+
