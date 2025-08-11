@@ -1,0 +1,364 @@
+
+#!/usr/bin/env python3
+"""
+MBT Recursive AGI Loop - Core Engine (Modular Version)
+Main orchestrator for the 9-step recursive learning cycle
+"""
+
+import json
+import time
+from typing import List, Dict, Any, Optional, Callable
+from dataclasses import asdict
+
+from .types import Claim, Contradiction, Patch, LearningEvent
+from .mbt import MBTEngine  
+from .neural_observer import NeuralObserver
+
+
+class RecursiveAGILoop:
+    """
+    Main orchestrator for the 9-step recursive learning cycle.
+    
+    This implements the core recursive loop:
+    1. MBT detects contradiction → Symbolic cognition activates
+    2. Human patches it → Human insight and rigor intervene  
+    3. MBT learns → Symbolic engine updates its logic
+    4. Neural observes → Neural model witnesses the repair
+    5. Neural learns → Neural model internalizes the pattern
+    6. MBT evolves → Symbolic system gains closure
+    7. Human evolves → Your understanding deepens
+    8. Neural evolves → Neural symbolic fluency improves
+    9. Loop restarts stronger → Cycle begins again
+    """
+    
+    def __init__(self, config: Optional[Dict[str, Any]] = None):
+        """
+        Initialize the recursive AGI loop.
+        
+        Args:
+            config: Optional configuration dictionary
+        """
+        self.config = config or {}
+        self.mbt_engine = MBTEngine(self.config.get('mbt_config', {}))
+        self.neural_observer = NeuralObserver(self.config.get('neural_config', {}))
+        
+        # Loop state
+        self.loop_count = 0
+        self.learning_events = []
+        self.human_evolution_score = 0.0
+        self.session_start_time = time.time()
+        
+        # Performance tracking
+        self.cycle_times = []
+        self.success_rate = 0.0
+        
+    def run_cycle(self, 
+                  claim: Claim, 
+                  human_patch_fn: Optional[Callable[[Contradiction], tuple]] = None,
+                  auto_patch: bool = False) -> Dict[str, Any]:
+        """
+        Execute one complete 9-step recursive cycle.
+        
+        Args:
+            claim: The claim to process
+            human_patch_fn: Optional function that takes a Contradiction and returns 
+                          (human_insight: str, repair_action: str)
+            auto_patch: If True and no human_patch_fn, use default patches
+            
+        Returns:
+            Dictionary containing cycle results and system state
+        """
+        cycle_start_time = time.time()
+        cycle_events = []
+        
+        # Step 1: MBT detects contradiction - Symbolic cognition activates
+        contradiction = self.mbt_engine.detect_contradiction(claim)
+        
+        if not contradiction:
+            return {
+                "status": "no_contradiction", 
+                "claim_id": claim.id,
+                "processing_time": time.time() - cycle_start_time
+            }
+        
+        cycle_events.append(LearningEvent(
+            step=1,
+            actor="MBT",
+            event_type="contradiction_detection",
+            data=asdict(contradiction),
+            timestamp=time.time()
+        ))
+        
+        # Step 2: Human patches it - Human insight and rigor intervene
+        if human_patch_fn:
+            try:
+                human_insight, repair_action = human_patch_fn(contradiction)
+            except Exception as e:
+                return {
+                    "status": "patch_error",
+                    "error": str(e),
+                    "claim_id": claim.id
+                }
+        elif auto_patch:
+            human_insight, repair_action = self._default_patch(contradiction)
+        else:
+            return {
+                "status": "patch_required",
+                "contradiction": asdict(contradiction),
+                "claim_id": claim.id,
+                "message": "Human patch function required or set auto_patch=True"
+            }
+        
+        patch = Patch(
+            contradiction_id=f"contradiction_{hash(claim.id)}",
+            human_insight=human_insight,
+            repair_action=repair_action,
+            applied_at=time.time(),
+            success=True  # Assume success; could be validated
+        )
+        
+        cycle_events.append(LearningEvent(
+            step=2,
+            actor="Human",
+            event_type="patch_application", 
+            data=asdict(patch),
+            timestamp=time.time()
+        ))
+        
+        # Step 3: MBT learns - Symbolic engine updates its logic
+        mbt_learned = self.mbt_engine.learn_from_patch(patch, contradiction)
+        cycle_events.append(LearningEvent(
+            step=3,
+            actor="MBT",
+            event_type="symbolic_learning",
+            data={
+                "success": mbt_learned,
+                "logic_map_size": len(self.mbt_engine.logic_map),
+                "total_patterns": sum(len(patterns) for patterns in self.mbt_engine.logic_map.values())
+            },
+            timestamp=time.time()
+        ))
+        
+        # Step 4: Neural observer observes - Neural model witnesses the repair
+        observation_event = self.neural_observer.observe_repair(contradiction, patch)
+        cycle_events.append(observation_event)
+        
+        # Step 5: Neural observer learns - Neural model internalizes the pattern
+        learning_event = self.neural_observer.learn_pattern()
+        if learning_event:
+            cycle_events.append(learning_event)
+        
+        # Step 6: MBT evolves - Symbolic system gains closure
+        mbt_evolution = self.mbt_engine.evolve()
+        cycle_events.append(LearningEvent(
+            step=6,
+            actor="MBT", 
+            event_type="symbolic_evolution",
+            data=mbt_evolution,
+            timestamp=time.time()
+        ))
+        
+        # Step 7: Human evolves - Your understanding deepens
+        self.human_evolution_score += 1.0
+        cycle_events.append(LearningEvent(
+            step=7,
+            actor="Human",
+            event_type="understanding_deepening",
+            data={"evolution_score": self.human_evolution_score},
+            timestamp=time.time()
+        ))
+        
+        # Step 8: Neural observer evolves - Neural symbolic fluency improves
+        neural_evolution = self.neural_observer.evolve_fluency()
+        cycle_events.append(LearningEvent(
+            step=8,
+            actor="Neural",
+            event_type="fluency_evolution",
+            data=neural_evolution,
+            timestamp=time.time()
+        ))
+        
+        # Step 9: Loop restarts stronger (implicit - system state updated)
+        self.loop_count += 1
+        self.learning_events.extend(cycle_events)
+        
+        cycle_time = time.time() - cycle_start_time
+        self.cycle_times.append(cycle_time)
+        
+        return {
+            "status": "cycle_complete",
+            "loop_count": self.loop_count,
+            "claim_id": claim.id,
+            "contradiction": asdict(contradiction),
+            "patch": asdict(patch),
+            "mbt_evolution": mbt_evolution,
+            "neural_evolution": neural_evolution,
+            "cycle_events": [asdict(event) for event in cycle_events],
+            "processing_time": cycle_time
+        }
+    
+    def run_batch(self, 
+                  claims: List[Claim], 
+                  human_patch_fn: Optional[Callable[[Contradiction], tuple]] = None,
+                  auto_patch: bool = True,
+                  progress_callback: Optional[Callable[[int, int], None]] = None) -> List[Dict[str, Any]]:
+        """
+        Run the recursive cycle on a batch of claims.
+        
+        Args:
+            claims: List of claims to process
+            human_patch_fn: Optional human patch function
+            auto_patch: Use default patches if no human function provided
+            progress_callback: Optional callback for progress updates
+            
+        Returns:
+            List of cycle results
+        """
+        results = []
+        
+        for i, claim in enumerate(claims):
+            if progress_callback:
+                progress_callback(i + 1, len(claims))
+                
+            result = self.run_cycle(claim, human_patch_fn, auto_patch)
+            results.append(result)
+            
+        return results
+    
+    def get_system_state(self) -> Dict[str, Any]:
+        """Get comprehensive current state of the recursive system."""
+        
+        successful_cycles = sum(1 for event in self.learning_events 
+                              if event.event_type == "cycle_complete")
+        
+        return {
+            # Core metrics
+            "loop_count": self.loop_count,
+            "session_duration": time.time() - self.session_start_time,
+            "successful_cycles": successful_cycles,
+            
+            # MBT state
+            "mbt_evolution_count": self.mbt_engine.evolution_count,
+            "mbt_logic_map_size": len(self.mbt_engine.logic_map),
+            "mbt_total_patterns": sum(len(patterns) for patterns in self.mbt_engine.logic_map.values()),
+            "mbt_domains": list(self.mbt_engine.logic_map.keys()),
+            
+            # Neural observer state  
+            "neural_fluency": self.neural_observer.symbolic_fluency,
+            "neural_patterns_learned": len(self.neural_observer.learned_patterns),
+            "neural_observations": len(self.neural_observer.observation_history),
+            
+            # Human evolution
+            "human_evolution_score": self.human_evolution_score,
+            
+            # Performance metrics
+            "total_contradictions": len(self.mbt_engine.contradiction_history),
+            "total_events": len(self.learning_events),
+            "average_cycle_time": sum(self.cycle_times) / max(len(self.cycle_times), 1),
+            
+            # System health
+            "memory_efficiency": self._calculate_memory_efficiency(),
+            "learning_velocity": self._calculate_learning_velocity()
+        }
+    
+    def export_learning_log(self, filepath: str, include_raw_events: bool = True) -> None:
+        """
+        Export complete learning log with custom JSON encoding for enums.
+        
+        Args:
+            filepath: Path to save the learning log
+            include_raw_events: Whether to include all learning events
+        """
+        
+        class EnumEncoder(json.JSONEncoder):
+            def default(self, obj):
+                if hasattr(obj, 'value'):  # Handle any enum
+                    return obj.value
+                elif hasattr(obj, '__dict__'):
+                    # Convert dataclass to dict and handle nested enums
+                    result = {}
+                    for key, value in obj.__dict__.items():
+                        if hasattr(value, 'value'):  # Handle enum values
+                            result[key] = value.value
+                        else:
+                            result[key] = value
+                    return result
+                return super().default(obj)
+        
+        export_data = {
+            "system_state": self.get_system_state(),
+            "mbt_logic_map": self.mbt_engine.logic_map,
+            "neural_patterns": self.neural_observer.learned_patterns,
+            "export_timestamp": time.time()
+        }
+        
+        if include_raw_events:
+            export_data["learning_events"] = [asdict(event) for event in self.learning_events]
+        
+        with open(filepath, "w") as f:
+            json.dump(export_data, f, indent=2, cls=EnumEncoder)
+    
+    def _default_patch(self, contradiction: Contradiction) -> tuple:
+        """Default patch function when no human patch is provided."""
+        
+        if contradiction.type.value == "Type II: Property Mismatch":
+            return ("Property needs context clarification", "Add contextual conditions")
+        elif contradiction.type.value == "Type III: Definitional Violation":
+            return ("Definitional constraint violated", "Reject malformed query")
+        elif contradiction.type.value == "Type IV: Counterexample to Universal":
+            return ("Universal claim has exceptions", "Revise quantifier or add exceptions")
+        else:
+            return ("Standard repair needed", contradiction.repair_suggestion)
+    
+    def _calculate_memory_efficiency(self) -> float:
+        """Calculate how efficiently the system is using memory."""
+        if not self.learning_events:
+            return 100.0
+        
+        # Simple heuristic: ratio of learning events to total contradictions
+        unique_contradictions = len(set(event.data.get('claim_id', '') 
+                                      for event in self.learning_events))
+        if unique_contradictions == 0:
+            return 100.0
+            
+        efficiency = min(100.0, (len(self.learning_events) / unique_contradictions) * 10)
+        return efficiency
+    
+    def _calculate_learning_velocity(self) -> float:
+        """Calculate how quickly the system is learning new patterns."""
+        if len(self.cycle_times) < 2:
+            return 0.0
+        
+        # Learning velocity: inverse of average cycle time, scaled by neural fluency
+        avg_time = sum(self.cycle_times) / len(self.cycle_times)
+        base_velocity = 1.0 / max(avg_time, 0.001)  # Avoid division by zero
+        
+        # Scale by neural fluency (higher fluency = faster learning)
+        fluency_multiplier = 1.0 + (self.neural_observer.symbolic_fluency / 100.0)
+        
+        return base_velocity * fluency_multiplier
+
+
+# Convenience function for simple usage
+def process_claims(claims: List[Claim], 
+                  human_patch_fn: Optional[Callable] = None,
+                  config: Optional[Dict] = None) -> Dict[str, Any]:
+    """
+    Convenience function to process claims with the recursive AGI loop.
+    
+    Args:
+        claims: List of claims to process
+        human_patch_fn: Optional human patch function
+        config: Optional configuration
+        
+    Returns:
+        Dictionary with results and final system state
+    """
+    loop = RecursiveAGILoop(config)
+    results = loop.run_batch(claims, human_patch_fn, auto_patch=True)
+    
+    return {
+        "results": results,
+        "system_state": loop.get_system_state(),
+        "loop_instance": loop  # Return loop for further analysis
+    }
