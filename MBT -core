@@ -1,0 +1,74 @@
+# mbt_core.py — MBT contradiction classifier
+
+IS_A = {
+    "platypus": "mammal",
+    "bat": "mammal",
+    "dolphin": "mammal",
+    "human": "mammal",
+    "cat": "mammal",
+    "dog": "mammal",
+    "whale": "mammal",
+    "triangle": "shape",
+}
+
+def classify(premise, query):
+    """
+    Classify contradiction type between premise and query.
+    Returns a dict with type, note, and repair suggestion.
+    """
+
+    # Type IV: Counterexample to Universal
+    if premise.get("kind") == "universal":
+        clazz = premise["class"]
+        pred = premise["predicate"]
+        q_subj = query.get("subject")
+        q_truth = query.get("truth")
+        q_pred = query.get("predicate")
+        is_instance = IS_A.get(q_subj, "") == clazz or q_subj == clazz
+        if is_instance and q_pred == pred and q_truth is False:
+            return {
+                "type": "Type IV (Counterexample to Universal)",
+                "note": f"'{q_subj}' contradicts universal claim 'All {clazz}s {pred}'.",
+                "repair": "Add exception clause or weaken quantifier (All→Most/Typically)."
+            }
+
+    # Type I: Direct Negation of Measurement
+    if premise.get("kind") == "measurement":
+        same_subject = premise.get("subject") == query.get("subject")
+        same_pred = premise.get("predicate") == query.get("predicate")
+        same_cond = premise.get("condition") == query.get("condition")
+
+        if same_subject and same_pred and same_cond:
+            p_val = premise.get("value")
+            q_val = query.get("value")
+            if p_val is not None and q_val is not None and p_val != q_val:
+                return {
+                    "type": "Type I (Direct Negation)",
+                    "note": f"Query value '{q_val}' contradicts premise value '{p_val}'.",
+                    "repair": "Clarify measurement context or disambiguate value."
+                }
+
+            if query.get("truth") is False:
+                return {
+                    "type": "Type I (Direct Negation)",
+                    "note": "Query denies premise measurement directly.",
+                    "repair": "Clarify measurement context or disambiguate truth value."
+                }
+
+    # Type III: Definitional Violation
+    if premise.get("kind") == "definition":
+        if (query.get("subject") in ("triangle", "triangles")
+            and query.get("predicate") == "three_sided"
+            and query.get("truth") is False):
+            return {
+                "type": "Type III (Definitional Violation)",
+                "note": "Query denies definitional property of triangles.",
+                "repair": "Reject query or redefine category; otherwise keep definition."
+            }
+
+    # Fallback
+    return {
+        "type": "None",
+        "note": "No contradiction found.",
+        "repair": "N/A"
+    }
