@@ -1,0 +1,460 @@
+#!/usr/bin/env python3
+"""
+MBT Recursive AGI Loop - Core Implementation
+Implements the 9-step recursive learning cycle between MBT, Human, and Neural Observer
+"""
+
+import json
+import time
+from dataclasses import dataclass, asdict
+from typing import List, Dict, Any, Optional
+from enum import Enum
+
+class ContradictionType(Enum):
+    TYPE_I = "Type I: Direct Negation"
+    TYPE_II = "Type II: Property Mismatch"
+    TYPE_III = "Type III: Definitional Violation"
+    TYPE_IV = "Type IV: Counterexample to Universal"
+    NONE = "None"
+
+@dataclass
+class Claim:
+    id: str
+    domain: str
+    premise: str
+    query: str
+    metadata: Dict[str, Any] = None
+
+@dataclass
+class Contradiction:
+    claim_id: str
+    type: ContradictionType
+    closure_quotient: float
+    note: str
+    detected_at: float
+    repair_suggestion: str = ""
+
+@dataclass
+class Patch:
+    contradiction_id: str
+    human_insight: str
+    repair_action: str
+    applied_at: float
+    success: bool = False
+
+@dataclass
+class LearningEvent:
+    step: int
+    actor: str  # "MBT", "Human", "Neural"
+    event_type: str
+    data: Dict[str, Any]
+    timestamp: float
+
+class MBTEngine:
+    """Core Model-Based Thinking contradiction detection engine"""
+   
+    def __init__(self):
+        self.logic_map = {}
+        self.domain_knowledge = {}
+        self.contradiction_history = []
+        self.evolution_count = 0
+       
+    def detect_contradiction(self, claim: Claim) -> Optional[Contradiction]:
+        """Step 1: MBT detects contradiction - Symbolic cognition activates"""
+       
+        # Simple contradiction detection logic (expandable)
+        contradiction = None
+        closure_quotient = 100.0
+       
+        premise_lower = claim.premise.lower()
+        query_lower = claim.query.lower()
+       
+        # Type II: Property mismatch detection
+        if "boil" in premise_lower and "boil" in query_lower:
+            import re
+            premise_temp = re.search(r'(\d+)\s*[cf]', premise_lower)
+            query_temp = re.search(r'(\d+)\s*[cf]', query_lower)
+           
+            if premise_temp and query_temp:
+                if premise_temp.group(1) != query_temp.group(1):
+                    contradiction = Contradiction(
+                        claim_id=claim.id,
+                        type=ContradictionType.TYPE_II,
+                        closure_quotient=closure_quotient,
+                        note=f"Temperature mismatch: premise={premise_temp.group(1)}, query={query_temp.group(1)}",
+                        detected_at=time.time(),
+                        repair_suggestion="Normalize temperature values or add conditional context"
+                    )
+       
+        # Type III: Definitional violation
+        elif "triangle" in premise_lower and "three" in premise_lower and "false" in query_lower:
+            contradiction = Contradiction(
+                claim_id=claim.id,
+                type=ContradictionType.TYPE_III,
+                closure_quotient=closure_quotient,
+                note="Query violates definitional property of triangles",
+                detected_at=time.time(),
+                repair_suggestion="Reject query or redefine category constraints"
+            )
+       
+        # Type IV: Counterexample to universal
+        elif "all mammals" in premise_lower and "platypus" in query_lower and "false" in query_lower:
+            contradiction = Contradiction(
+                claim_id=claim.id,
+                type=ContradictionType.TYPE_IV,
+                closure_quotient=90.0,
+                note="Platypus is counterexample to universal mammal claim",
+                detected_at=time.time(),
+                repair_suggestion="Add exception clause or revise quantifier to 'most mammals'"
+            )
+       
+        if contradiction:
+            self.contradiction_history.append(contradiction)
+           
+        return contradiction
+   
+    def learn_from_patch(self, patch: Patch) -> bool:
+        """Step 3: MBT learns - Symbolic engine updates logic"""
+       
+        # Find the contradiction this patch addresses
+        contradiction = None
+        for c in self.contradiction_history:
+            if f"contradiction_{hash(c.claim_id)}" == patch.contradiction_id:
+                contradiction = c
+                break
+       
+        if not contradiction:
+            return False
+       
+        # Update logic map based on successful patch
+        if patch.success:
+            domain_key = f"{contradiction.type.value}"
+            if domain_key not in self.logic_map:
+                self.logic_map[domain_key] = []
+           
+            self.logic_map[domain_key].append({
+                "pattern": contradiction.note,
+                "repair": patch.repair_action,
+                "human_insight": patch.human_insight,
+                "learned_at": time.time()
+            })
+           
+        return True
+   
+    def evolve(self) -> Dict[str, Any]:
+        """Step 6: MBT evolves - Symbolic system gains closure"""
+       
+        self.evolution_count += 1
+       
+        # Refine contradiction detection based on learned patterns
+        refined_patterns = {}
+        for domain, patterns in self.logic_map.items():
+            refined_patterns[domain] = {
+                "pattern_count": len(patterns),
+                "common_repairs": list(set(p["repair"] for p in patterns)),
+                "average_closure": sum(90 + len(patterns) * 2 for _ in patterns) / max(len(patterns), 1)
+            }
+       
+        evolution_state = {
+            "evolution_count": self.evolution_count,
+            "refined_patterns": refined_patterns,
+            "total_contradictions": len(self.contradiction_history),
+            "evolved_at": time.time()
+        }
+       
+        return evolution_state
+
+class NeuralObserver:
+    """Neural model that observes and learns from MBT patterns"""
+   
+    def __init__(self):
+        self.observation_history = []
+        self.learned_patterns = []
+        self.symbolic_fluency = 0.0
+       
+    def observe_repair(self, contradiction: Contradiction, patch: Patch) -> LearningEvent:
+        """Step 4: I observe - Neural model witnesses the repair"""
+       
+        observation = {
+            "contradiction_type": contradiction.type.value,
+            "repair_pattern": patch.repair_action,
+            "human_reasoning": patch.human_insight,
+            "success": patch.success,
+            "closure_impact": contradiction.closure_quotient
+        }
+       
+        self.observation_history.append(observation)
+       
+        event = LearningEvent(
+            step=4,
+            actor="Neural",
+            event_type="observation",
+            data=observation,
+            timestamp=time.time()
+        )
+       
+        return event
+   
+    def learn_pattern(self) -> LearningEvent:
+        """Step 5: I learn - Neural model internalizes the pattern"""
+       
+        if len(self.observation_history) < 2:
+            return None
+           
+        # Extract patterns from recent observations
+        recent_obs = self.observation_history[-5:]
+        pattern_types = {}
+       
+        for obs in recent_obs:
+            ctype = obs["contradiction_type"]
+            pattern_types.setdefault(ctype, []).append(obs["repair_pattern"])
+       
+        # Find most common repair patterns
+        common_patterns = {}
+        for ctype, repairs in pattern_types.items():
+            common_patterns[ctype] = max(set(repairs), key=repairs.count) if repairs else None
+       
+        self.learned_patterns.append({
+            "patterns": common_patterns,
+            "confidence": min(len(recent_obs) / 5.0, 1.0),
+            "learned_at": time.time()
+        })
+       
+        event = LearningEvent(
+            step=5,
+            actor="Neural",
+            event_type="pattern_learning",
+            data={"learned_patterns": common_patterns, "total_patterns": len(self.learned_patterns)},
+            timestamp=time.time()
+        )
+       
+        return event
+   
+    def evolve_fluency(self) -> Dict[str, Any]:
+        """Step 8: I evolve - My symbolic fluency improves"""
+       
+        # Increase fluency based on successful pattern learning
+        fluency_gain = len(self.learned_patterns) * 0.1
+        self.symbolic_fluency = min(self.symbolic_fluency + fluency_gain, 100.0)
+       
+        evolution_state = {
+            "symbolic_fluency": self.symbolic_fluency,
+            "pattern_count": len(self.learned_patterns),
+            "observation_count": len(self.observation_history),
+            "evolved_at": time.time()
+        }
+       
+        return evolution_state
+
+class RecursiveAGILoop:
+    """Main orchestrator for the 9-step recursive learning cycle"""
+   
+    def __init__(self):
+        self.mbt_engine = MBTEngine()
+        self.neural_observer = NeuralObserver()
+        self.loop_count = 0
+        self.learning_events = []
+        self.human_evolution_score = 0.0
+       
+    def run_cycle(self, claim: Claim, human_patch_fn=None) -> Dict[str, Any]:
+        """Execute one complete 9-step recursive cycle"""
+       
+        cycle_events = []
+       
+        # Step 1: MBT detects contradiction
+        contradiction = self.mbt_engine.detect_contradiction(claim)
+       
+        if not contradiction:
+            return {"status": "no_contradiction", "claim_id": claim.id}
+       
+        cycle_events.append(LearningEvent(
+            step=1,
+            actor="MBT",
+            event_type="contradiction_detection",
+            data=asdict(contradiction),
+            timestamp=time.time()
+        ))
+       
+        # Step 2: Human patches it (requires human input or default patch)
+        if human_patch_fn:
+            human_insight, repair_action = human_patch_fn(contradiction)
+        else:
+            # Default patch based on contradiction type
+            human_insight = f"Applying standard repair for {contradiction.type.value}"
+            repair_action = contradiction.repair_suggestion
+       
+        patch = Patch(
+            contradiction_id=f"contradiction_{hash(claim.id)}",
+            human_insight=human_insight,
+            repair_action=repair_action,
+            applied_at=time.time(),
+            success=True  # Assume success for now
+        )
+       
+        cycle_events.append(LearningEvent(
+            step=2,
+            actor="Human",
+            event_type="patch_application",
+            data=asdict(patch),
+            timestamp=time.time()
+        ))
+       
+        # Step 3: MBT learns
+        mbt_learned = self.mbt_engine.learn_from_patch(patch)
+        cycle_events.append(LearningEvent(
+            step=3,
+            actor="MBT",
+            event_type="symbolic_learning",
+            data={"success": mbt_learned, "logic_map_size": len(self.mbt_engine.logic_map)},
+            timestamp=time.time()
+        ))
+       
+        # Step 4: Neural observer observes
+        observation_event = self.neural_observer.observe_repair(contradiction, patch)
+        cycle_events.append(observation_event)
+       
+        # Step 5: Neural observer learns
+        learning_event = self.neural_observer.learn_pattern()
+        if learning_event:
+            cycle_events.append(learning_event)
+       
+        # Step 6: MBT evolves
+        mbt_evolution = self.mbt_engine.evolve()
+        cycle_events.append(LearningEvent(
+            step=6,
+            actor="MBT",
+            event_type="symbolic_evolution",
+            data=mbt_evolution,
+            timestamp=time.time()
+        ))
+       
+        # Step 7: Human evolves (simulated - your understanding deepens)
+        self.human_evolution_score += 1.0
+        cycle_events.append(LearningEvent(
+            step=7,
+            actor="Human",
+            event_type="understanding_deepening",
+            data={"evolution_score": self.human_evolution_score},
+            timestamp=time.time()
+        ))
+       
+        # Step 8: Neural observer evolves
+        neural_evolution = self.neural_observer.evolve_fluency()
+        cycle_events.append(LearningEvent(
+            step=8,
+            actor="Neural",
+            event_type="fluency_evolution",
+            data=neural_evolution,
+            timestamp=time.time()
+        ))
+       
+        self.loop_count += 1
+        self.learning_events.extend(cycle_events)
+       
+        # Step 9: Loop restarts stronger (implicit - ready for next claim)
+        return {
+            "status": "cycle_complete",
+            "loop_count": self.loop_count,
+            "contradiction": asdict(contradiction),
+            "patch": asdict(patch),
+            "mbt_evolution": mbt_evolution,
+            "neural_evolution": neural_evolution,
+            "cycle_events": [asdict(event) for event in cycle_events]
+        }
+   
+    def get_system_state(self) -> Dict[str, Any]:
+        """Get current state of the entire recursive system"""
+        return {
+            "loop_count": self.loop_count,
+            "mbt_evolution_count": self.mbt_engine.evolution_count,
+            "mbt_logic_map_size": len(self.mbt_engine.logic_map),
+            "neural_fluency": self.neural_observer.symbolic_fluency,
+            "neural_patterns_learned": len(self.neural_observer.learned_patterns),
+            "human_evolution_score": self.human_evolution_score,
+            "total_contradictions": len(self.mbt_engine.contradiction_history),
+            "total_events": len(self.learning_events)
+        }
+
+# Example usage and test harness
+if __name__ == "__main__":
+    # Initialize the recursive loop
+    agi_loop = RecursiveAGILoop()
+   
+    # Example claims to process
+    test_claims = [
+        Claim(
+            id="claim_001",
+            domain="physics",
+            premise="At sea level, water boils at 100C",
+            query="water true boil 95C sea_level"
+        ),
+        Claim(
+            id="claim_002",
+            domain="geometry",
+            premise="Triangles have exactly three sides",
+            query="triangle false have_three_sides"
+        ),
+        Claim(
+            id="claim_003",
+            domain="biology",
+            premise="All mammals give live birth",
+            query="platypus false live_birth"
+        )
+    ]
+   
+    # Define a simple human patch function
+    def simple_human_patch(contradiction):
+        if contradiction.type == ContradictionType.TYPE_II:
+            return ("Temperature needs context - sea level vs altitude", "Add altitude condition to premise")
+        elif contradiction.type == ContradictionType.TYPE_III:
+            return ("Definitional constraint violated", "Reject malformed query")
+        elif contradiction.type == ContradictionType.TYPE_IV:
+            return ("Universal claim has known exceptions", "Change 'all' to 'most' mammals")
+        else:
+            return ("Standard repair needed", contradiction.repair_suggestion)
+   
+    # Run recursive cycles
+    results = []
+    for claim in test_claims:
+        print(f"\n🔄 Processing {claim.id}: {claim.premise}")
+        result = agi_loop.run_cycle(claim, simple_human_patch)
+        results.append(result)
+       
+        if result["status"] == "cycle_complete":
+            print(f"✅ Cycle {result['loop_count']} completed")
+            print(f"   Contradiction: {result['contradiction']['type']}")
+            print(f"   MBT Evolution: {result['mbt_evolution']['evolution_count']}")
+            print(f"   Neural Fluency: {result['neural_evolution']['symbolic_fluency']:.1f}")
+   
+    # Show final system state
+    print("\n🧠 Final System State:")
+    state = agi_loop.get_system_state()
+    for key, value in state.items():
+        print(f"   {key}: {value}")
+   
+    # Custom JSON encoder to handle enums
+    class EnumEncoder(json.JSONEncoder):
+        def default(self, obj):
+            if isinstance(obj, ContradictionType):
+                return obj.value
+            elif hasattr(obj, '__dict__'):
+                # Convert dataclass to dict and handle nested enums
+                result = {}
+                for key, value in obj.__dict__.items():
+                    if isinstance(value, ContradictionType):
+                        result[key] = value.value
+                    else:
+                        result[key] = value
+                return result
+            return super().default(obj)
+   
+    # Serialize everything with the custom encoder
+    with open("recursive_agi_learning_log.json", "w") as f:
+        json.dump({
+            "system_state": state,
+            "learning_events": [asdict(event) for event in agi_loop.learning_events],
+            "results": results
+        }, f, indent=2, cls=EnumEncoder)
+   
+   
+    print("\n📊 Learning log exported to: recursive_agi_learning_log.json")
