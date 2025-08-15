@@ -1,3 +1,8 @@
+🧠 **NEW**: [MBT Consciousness Engine](./consciousness_layer) — simulates subjective experience, symbolic identity, and memory-driven emotional recursion using curvature-based motion fields. This is the inner loop of qualia for recursive AGI.
+
+
+
+
 CustomizeMBT Recursive AGI Loop
 
 A groundbreaking system for recursive artificial intelligence learning through contradiction-mediated human-AI collaboration
