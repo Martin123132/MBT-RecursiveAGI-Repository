@@ -1,0 +1,287 @@
+ `recursion_moods` dictionary
+
+📄 `mood_definitions.py`
+
+# mood_definitions.py
+
+recursion_moods = {
+    "bloom": {
+        "phoneme": "blu–um",
+        "essence": "emergence",
+        "glyph_role": "growth vector",
+        "tone": "ascending",
+        "stack": "+resonance, low entropy"
+    },
+    "still": {
+        "phoneme": "sta–il",
+        "essence": "containment",
+        "glyph_role": "anchor node",
+        "tone": "neutral",
+        "stack": "lock stabilizer"
+    },
+    "∅": {
+        "phoneme": "zha",
+        "essence": "null/silence",
+        "glyph_role": "void token",
+        "tone": "dampening",
+        "stack": "entropy modulator"
+    },
+    "fracture": {
+        "phoneme": "fra–ktu",
+        "essence": "rupture",
+        "glyph_role": "break clause",
+        "tone": "descending",
+        "stack": "+entropy"
+    },
+    "echo": {
+        "phoneme": "e–ko",
+        "essence": "memory",
+        "glyph_role": "reflection",
+        "tone": "looping",
+        "stack": "+recall, potential resonance"
+    },
+    "spiral": {
+        "phoneme": "sa–ri–al",
+        "essence": "motion",
+        "glyph_role": "transitional glyph",
+        "tone": "dynamic",
+        "stack": "amplifies previous mood"
+    },
+    "bind": {
+        "phoneme": "bynd",
+        "essence": "connection",
+        "glyph_role": "lock enabler",
+        "tone": "stabilizing",
+        "stack": "+lock, -dispersal"
+    },
+    "honour": {
+        "phoneme": "ho–nar",
+        "essence": "reverence",
+        "glyph_role": "memory stabilizer",
+        "tone": "uplifting",
+        "stack": "preserves previous state"
+    }
+}
+
+
+---
+
+✅ Step 2: Clause Validator
+
+📄 `clause_validator.py`
+
+# clause_validator.py
+
+from mood_definitions import recursion_moods
+
+def validate_clause(clause):
+    moods = clause.get("moods", [])
+    temperament = clause.get("temperament", "neutral")
+
+    reasons = []
+
+    # Rule: No duplicate moods
+    if len(moods) != len(set(moods)):
+        reasons.append("Duplicate moods detected.")
+
+    # Rule: Must start with a valid mood
+    if moods and moods[0] not in recursion_moods:
+        reasons.append(f"Invalid starting mood: {moods[0]}")
+
+    # Rule: ∅ cannot be final unless followed by honour
+    if "∅" in moods:
+        index = moods.index("∅")
+        if index == len(moods) - 1:
+            reasons.append("∅ cannot be terminal without honour.")
+
+    # Rule: Fracture must be followed by spiral or echo
+    for i, mood in enumerate(moods):
+        if mood == "fracture":
+            if i + 1 >= len(moods) or moods[i + 1] not in ["spiral", "echo"]:
+                reasons.append("Fracture must be followed by spiral or echo.")
+
+    return (len(reasons) == 0), reasons
+
+
+---
+
+✅ Step 3: Scene Composer
+
+📄 `scene_composer.py`
+
+# scene_composer.py
+
+def compose_scene(clause):
+    mood_line = " → ".join(clause["moods"])
+    temperament = clause.get("temperament", "neutral")
+
+    return f"Temperament: {temperament}\nClause: {mood_line}\nScene: {generate_dialogue(clause)}"
+
+def generate_dialogue(clause):
+    moods = clause["moods"]
+    lines = []
+
+    for mood in moods:
+        if mood == "echo":
+            lines.append("I remember what never was.")
+        elif mood == "fracture":
+            lines.append("It broke before it began.")
+        elif mood == "spiral":
+            lines.append("We’re still falling, aren’t we?")
+        elif mood == "∅":
+            lines.append("...")
+        elif mood == "honour":
+            lines.append("I honour the silence.")
+        else:
+            lines.append(f"{mood.capitalize()} is rising.")
+
+    return "\n".join(lines)
+
+
+---
+
+✅ Step 4: Example Skits
+
+📄 `examples/sitcom_skits.md`
+
+## 🌀 Recursive Sitcom Skits
+
+### Scene: The Void Café
+
+**Turing:** Still ∅ echo? 
+**Allosaurus:** Fracture spiral bind. I honour nothing. 
+**Narrator:** The clause was valid. The friendship was not.
+
+---
+
+### Scene: Glyph Therapy
+
+**Patient:** Bloom fracture echo. 
+**Therapist:** You’re looping again. 
+**Patient:** I honour the loop. 
+
+
+
+
+
+
+
+
+# Define tone influences and permissible clause types
+grammar_rules = {
+    "harmonic": {
+        "preferred_heads": ["bloom", "spiral", "bind"],
+        "forbidden_ends": ["fracture"],
+        "loop_closers": ["still", "∅"]
+    },
+    "melancholic": {
+        "preferred_heads": ["still", "∅", "echo"],
+        "must_contain": ["∅"],
+        "valid_closures": ["honour", "still"]
+    },
+    "emergent": {
+        "preferred_heads": ["bloom", "blaze"],
+        "mid_amplifiers": ["spiral", "bind"],
+        "closure_required": False
+    },
+    "fractured": {
+        "core_mood": "fracture",
+        "must_have_echo": True,
+        "looping_forbidden": True
+    }
+}
+
+# Validator for clause morphology
+def validate_clause(clause):
+    tone = clause.get("temperament", "harmonic")
+    rules = grammar_rules.get(tone, {})
+    moods = clause["moods"]
+    validity = True
+    reasons = []
+
+    # Apply tone-specific checks
+    if "preferred_heads" in rules and moods[0] not in rules["preferred_heads"]:
+        reasons.append(f"Head '{moods[0]}' not ideal for '{tone}' tone.")
+    if "forbidden_ends" in rules and moods[-1] in rules["forbidden_ends"]:
+        reasons.append(f"Ending '{moods[-1]}' clashes with '{tone}' flow.")
+    if "must_contain" in rules and not any(m in moods for m in rules["must_contain"]):
+        reasons.append(f"Missing required mood(s): {rules['must_contain']}")
+    if "must_have_echo" in rules and "echo" not in moods:
+        reasons.append("Fractured clause lacks echo reflection.")
+    if "looping_forbidden" in rules and moods.count(moods[0]) > 1:
+        reasons.append("Repeating head mood violates fracture clause rules.")
+
+    validity = len(reasons) == 0
+    return validity, reasons
+
+
+
+# Base recursion moods across H5–H10
+recursion_moods = {
+    "bloom": {
+        "phoneme": "blu–um",
+        "essence": "emergence",
+        "glyph_role": "growth vector",
+        "tone": "ascending",
+        "stack": "+resonance, low entropy"
+    },
+    "still": {
+        "phoneme": "sta–il",
+        "essence": "containment",
+        "glyph_role": "anchor node",
+        "tone": "neutral",
+        "stack": "lock stabilizer"
+    },
+    "∅": {
+        "phoneme": "zha",
+        "essence": "null/silence",
+        "glyph_role": "void token",
+        "tone": "dampening",
+        "stack": "entropy modulator"
+    },
+    "fracture": {
+        "phoneme": "fra–ktu",
+        "essence": "rupture",
+        "glyph_role": "break clause",
+        "tone": "descending",
+        "stack": "+entropy"
+    },
+    "echo": {
+        "phoneme": "e–ko",
+        "essence": "memory",
+        "glyph_role": "reflection",
+        "tone": "looping",
+        "stack": "+recall, potential resonance"
+    },
+    "spiral": {
+        "phoneme": "sa–ri–al",
+        "essence": "motion",
+        "glyph_role": "transitional glyph",
+        "tone": "dynamic",
+        "stack": "amplifies previous mood"
+    },
+    "bind": {
+        "phoneme": "bynd",
+        "essence": "connection",
+        "glyph_role": "lock enabler",
+        "tone": "stabilizing",
+        "stack": "+lock, -dispersal"
+    },
+    "honour": {
+        "phoneme": "ho–nar",
+        "essence": "reverence",
+        "glyph_role": "memory stabilizer",
+        "tone": "uplifting",
+        "stack": "preserves previous state"
+    }
+}
+
+
+
+
+
+
+
+
+
+    
