@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from ‘react’;
 import { Play, Pause, RotateCcw, Zap, Skull, Crown, TreePine, Users } from ‘lucide-react’;
 
