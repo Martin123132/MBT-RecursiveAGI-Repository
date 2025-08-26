@@ -1,0 +1,1874 @@
+# Demonstration and export functions for Paradox Geometry Field
+
+def demonstrate_paradox_geometry_field():
+    """Demonstrate the complete Paradox Geometry Field in action."""
+    
+    print("🌀 PARADOX GEOMETRY FIELD DEMONSTRATION")
+    print("=" * 60)
+    print("Modeling contradictions as curvature tension and resolutions as geometric flows")
+    print()
+    
+    # Initialize the field
+    field = ParadoxGeometryField()
+    
+    # Test classic paradox
+    print("📋 TEST CASE: Liar Paradox")
+    premise_text = "This statement is false"
+    query_text = "This statement is true"
+    
+    print(f"Premise: '{premise_text}'")
+    print(f"Query: '{query_text}'")
+    print()
+    
+    # Convert to geometric representation
+    premise_vector = np.array([1.0, 0.0, 1.0])  # Negation=True, Quantifier=None, SelfRef=True
+    query_vector = np.array([-1.0, 0.0, 1.0])   # Negation=False, Quantifier=None, SelfRef=True
+    
+    print("🔬 GEOMETRIC ANALYSIS:")
+    
+    # Calculate contradiction tensor
+    contradiction_tensor = field.calculate_contradiction_tensor(premise_vector, query_vector)
+    print(f"Curvature Tension: {contradiction_tensor['tension_magnitude']:.3f}")
+    print(f"Logical Distance: {contradiction_tensor['logical_distance']:.3f}")
+    print(f"Interference Strength: {contradiction_tensor['interference_strength']:.3f}")
+    print()
+    
+    # Find resolution attractors
+    attractors = field.find_resolution_attractors(contradiction_tensor)
+    print(f"🎯 FOUND {len(attractors)} RESOLUTION ATTRACTORS:")
+    
+    for i, attractor in enumerate(attractors[:3]):  # Show top 3
+        print(f"{i+1}. {attractor['strategy'].replace('_', ' ').title()}")
+        print(f"   Attractor Strength: {attractor['attractor_strength']:.3f}")
+        print(f"   Energy Release: {attractor['energy_release']:.3f}")
+        print(f"   Target Dimension: {attractor['target_dimension']}D")
+        print(f"   Resolution Probability: {attractor['resolution_probability']:.1%}")
+        print()
+    
+    # Execute best resolution flow
+    if attractors:
+        best_strategy = attractors[0]["strategy"]
+        print(f"🌊 EXECUTING GEOMETRIC FLOW: {best_strategy.replace('_', ' ').title()}")
+        
+        flow_result = field.execute_resolution_flow(contradiction_tensor, best_strategy, flow_steps=50)
+        
+        print(f"Initial Energy: {flow_result['energy_history'][0]:.3f}")
+        print(f"Final Energy: {flow_result['final_energy']:.3f}")
+        print(f"Energy Dissipated: {flow_result['energy_    def validate_contradiction(self, premise: str, query: str) -> Dict[str, Any]:
+        """
+        Enhanced MBT-inspired contradiction validation using geometric logic principles.
+        Now includes sophisticated analysis patterns discovered through self-testing.
+        """
+        premise_parsed = self.parse_statement(premise)
+        query_parsed = self.parse_statement(query)
+        
+        # Type I: Direct Negation Detection (Enhanced)
+        direct_negation = self._check_direct_negation_enhanced(premise_parsed, query_parsed)
+        if direct_negation:
+            return {
+                "type": ContradictionType.TYPE_I_DIRECT_NEGATION,
+                "confidence": direct_negation["confidence"],
+                "explanation": direct_negation["explanation"],
+                "repair": "Resolve negation or check context",
+                "mbt_reasoning": "Motion field inversion - opposite curvature directions",
+                "geometric_interpretation": "Premise and query represent opposing motion vectors in logical space"
+            }
+        
+        # Type II: Property Mismatch (Enhanced with numerical analysis)
+        property_conflict = self._check_property_mismatch_enhanced(premise_parsed, query_parsed)
+        if property_conflict:
+            return {
+                "type": ContradictionType.TYPE_II_PROPERTY_MISMATCH,
+                "confidence": property_conflict["confidence"],
+                "explanation": property_conflict["explanation"],
+                "repair": "Clarify measurement context or resolve conflicting values",
+                "mbt_reasoning": "Curvature field incompatible configurations - same property, different values",
+                "geometric_interpretation": f"Property space curvature conflict: {property_conflict['details']}"
+            }
+        
+        # Type III: Definitional Violation (Enhanced)
+        def_violation = self._check_definitional_violation_enhanced(premise_parsed, query_parsed)
+        if def_violation:
+            return {
+                "type": ContradictionType.TYPE_III_DEFINITIONAL_VIOLATION,
+                "confidence": def_violation["confidence"],
+                "explanation": def_violation["explanation"],
+                "repair": "Maintain definition or reclassify object",
+                "mbt_reasoning": "Essential geometric constraints violated - core identity curvature disrupted",
+                "geometric_interpretation": f"Identity field violation: {def_violation['details']}"
+            }
+        
+        # Type IV: Counterexample to Universal (Enhanced)
+        counterex = self._check_counterexample_enhanced(premise_parsed, query_parsed)
+        if counterex:
+            return {
+                "type": ContradictionType.TYPE_IV_COUNTEREXAMPLE,
+                "confidence": counterex["confidence"],
+                "explanation": counterex["explanation"],
+                "repair": "Add exceptions or weaken quantifier (All→Most/Typically)",
+                "mbt_reasoning": "Universal field pattern has singular exception - curvature discontinuity",
+                "geometric_interpretation": f"Universal field broken by exception: {counterex['details']}"
+            }
+        
+        # Type V: Modal Logic Conflict (Enhanced)
+        modal_conflict = self._check_modal_conflict_enhanced(premise_parsed, query_parsed)
+        if modal_conflict:
+            return {
+                "type": ContradictionType.TYPE_V_MODAL_CONFLICT,
+                "confidence": modal_conflict["confidence"],
+                "explanation": modal_conflict["explanation"],
+                "repair": "Clarify necessity/possibility relationships or add conditional context",
+                "mbt_reasoning": "Probability field interference - necessity conflicts with possibility space",
+                "geometric_interpretation": f"Modal space contradiction: {modal_conflict['details']}"
+            }
+        
+        # Type VI: Temporal Inconsistency (Enhanced)
+        temporal_issue = self._check_temporal_inconsistency_enhanced(premise_parsed, query_parsed)
+        if temporal_issue:
+            return {
+                "type": ContradictionType.TYPE_VI_TEMPORAL_INCONSISTENCY,
+                "confidence": temporal_issue["confidence"],
+                "explanation": temporal_issue["explanation"],
+                "repair": "Clarify timeline, sequence of events, or causal relationships",
+                "mbt_reasoning": "Time geometry curvature contradiction - causal flow violation",
+                "geometric_interpretation": f"Temporal curvature conflict: {temporal_issue['details']}"
+            }
+        
+        # Type VII: Context-Dependent Contradiction (New sophisticated type)
+        context_conflict = self._check_context_dependent_contradiction(premise_parsed, query_parsed)
+        if context_conflict:
+            return {
+                "type": ContradictionType.TYPE_VII_CONTEXT_DEPENDENT,
+                "confidence": context_conflict["confidence"],
+                "explanation": context_conflict["explanation"],
+                "repair": "Clarify contextual assumptions or domain-specific conditions",
+                "mbt_reasoning": "Context field incompatibility - different reference frames",
+                "geometric_interpretation": f"Reference frame conflict: {context_conflict['details']}"
+            }
+        
+        # Enhanced compatibility analysis
+        compatibility = self._analyze_compatibility(premise_parsed, query_parsed)
+        
+        return {
+            "type": ContradictionType.NONE,
+            "confidence": compatibility["confidence"],
+            "explanation": compatibility["explanation"],
+            "repair": "N/A",
+            "mbt_reasoning": "Geometric fields are compatible - no curvature conflicts detected",
+            "geometric_interpretation": "Statements exist in compatible regions of logical space"
+        }
+    
+    def _check_direct_negation_enhanced(self, premise: Dict, query: Dict) -> Optional[Dict]:
+        """Enhanced direct negation detection with confidence scoring."""
+        premise_negated = bool(premise["negations"])
+        query_negated = bool(query["negations"])
+        
+        # Check for exact semantic opposites
+        if premise_negated != query_negated:
+            # Look for overlapping content
+            premise_content = set(premise["words"]) - set(premise["negations"])
+            query_content = set(query["words"]) - set(query["negations"])
+            overlap = len(premise_content & query_content) / max(len(premise_content), len(query_content))
+            
+            if overlap > 0.6:  # High content overlap with opposite truth values
+                return {
+                    "confidence": 0.9 + (overlap - 0.6) * 0.25,  # 0.9-1.0 range
+                    "explanation": f"Direct negation detected with {overlap:.1%} content overlap",
+                    "details": f"Negation difference: premise={premise_negated}, query={query_negated}"
+                }
+        
+        return None
+    
+    def _check_property_mismatch_enhanced(self, premise: Dict, query: Dict) -> Optional[Dict]:
+        """Enhanced property mismatch with numerical analysis."""
+        # Check for numerical conflicts with same context
+        if premise["numbers"] and query["numbers"]:
+            premise_nums = premise["numbers"]
+            query_nums = query["numbers"]
+            
+            # Check if discussing same entity/property
+            common_entities = set(premise["entities"]) & set(query["entities"])
+            common_words = set(premise["words"]) & set(query["words"])
+            
+            if common_entities and len(common_words) > 3:  # Substantial overlap
+                if premise_nums != query_nums:
+                    confidence = 0.85 if common_entities else 0.7
+                    return {
+                        "confidence": confidence,
+                        "explanation": f"Numerical mismatch: {premise_nums} vs {query_nums} for same context",
+                        "details": f"Entities: {common_entities}, Values: {premise_nums} ≠ {query_nums}"
+                    }
+        
+        # Check for contradictory property assertions
+        premise_props = set(premise["predicates"])
+        query_props = set(query["predicates"])
+        
+        # Look for explicit property conflicts (e.g., "hot" vs "cold")
+        property_opposites = {
+            ("hot", "cold"), ("large", "small"), ("fast", "slow"), 
+            ("light", "dark"), ("high", "low"), ("strong", "weak")
+        }
+        
+        for prop1, prop2 in property_opposites:
+            if (prop1 in premise_props and prop2 in query_props) or (prop2 in premise_props and prop1 in query_props):
+                return {
+                    "confidence": 0.8,
+                    "explanation": f"Contradictory properties: {prop1} vs {prop2}",
+                    "details": f"Property opposition detected: {premise_props} vs {query_props}"
+                }
+        
+        return None
+    
+    def _check_definitional_violation_enhanced(self, premise: Dict, query: Dict) -> Optional[Dict]:
+        """Enhanced definitional violation detection."""
+        # Check violations of essential properties
+        for entity in query["entities"]:
+            if entity in self.knowledge_base["is_a"]:
+                category = self.knowledge_base["is_a"][entity]
+                if category in self.knowledge_base["properties"]:
+                    essential_props = self.knowledge_base["properties"][category]
+                    
+                    # Check if query denies essential property
+                    for prop in essential_props:
+                        prop_words = prop.replace("_", " ").split()
+                        if (any(word in query["words"] for word in prop_words) and 
+                            query["negations"]):
+                            return {
+                                "confidence": 0.9,
+                                "explanation": f"{entity} cannot lack essential property {prop}",
+                                "details": f"Category {category} requires {prop}, but query denies it"
+                            }
+        
+        # Check for definitional contradictions in premise
+        for entity in premise["entities"]:
+            # Look for explicit definitional statements
+            if any(word in premise["words"] for word in ["have", "has", "exactly", "always"]):
+                if entity in query["entities"] and query["negations"]:
+                    return {
+                        "confidence": 0.85,
+                        "explanation": f"Query violates stated definition of {entity}",
+                        "details": f"Definition: {premise['raw']} vs Query: {query['raw']}"
+                    }
+        
+        return None
+    
+    def _check_counterexample_enhanced(self, premise: Dict, query: Dict) -> Optional[Dict]:
+        """Enhanced counterexample detection with known exceptions."""
+        # Check for universal quantifiers in premise
+        if premise["quantifier"]["type"] in ["universal", "negative_universal"]:
+            
+            # Extract the claimed universal property
+            premise_entities = premise["entities"]
+            premise_props = premise["predicates"]
+            
+            # Check if query provides counterexample
+            query_entities = query["entities"]
+            
+            for entity in query_entities:
+                # Check if entity is instance of universal class
+                if entity in self.knowledge_base["is_a"]:
+                    entity_category = self.knowledge_base["is_a"][entity]
+                    
+                    # Check if premise makes universal claim about this category
+                    category_mentioned = any(cat in premise["words"] for cat in [entity_category, entity_category + "s"])
+                    
+                    if category_mentioned:
+                        # Check if entity is known exception
+                        if entity in self.knowledge_base.get("exceptions", {}):
+                            exceptions = self.knowledge_base["exceptions"][entity]
+                            
+                            # See if query mentions property that conflicts with universal claim
+                            query_negated = bool(query["negations"])
+                            premise_negated = bool(premise["negations"])
+                            
+                            if query_negated != premise_negated:  # Opposite truth values
+                                return {
+                                    "confidence": 0.88,
+                                    "explanation": f"{entity} is a known counterexample to universal claim about {entity_category}s",
+                                    "details": f"Universal: {premise['raw']}, Exception: {entity} with properties {exceptions}"
+                                }
+            
+            # General counterexample pattern
+            if query_entities and query["negations"] and premise["quantifier"]["type"] == "universal":
+                return {
+                    "confidence": 0.75,
+                    "explanation": "Potential counterexample to universal claim",
+                    "details": f"Universal claim contradicted by specific instance"
+                }
+        
+        return None
+    
+    def _check_modal_conflict_enhanced(self, premise: Dict, query: Dict) -> Optional[Dict]:
+        """Enhanced modal logic conflict detection."""
+        premise_modal = premise["modal"]
+        query_modal = query["modal"]
+        
+        if premise_modal["type"] and query_modal["type"]:
+            # Strong conflicts
+            strong_conflicts = [
+                ("necessity", "possibility"),  # must vs might
+                ("necessity", "permission"),   # must vs may  
+                ("obligation", "permission")   # should vs may
+            ]
+            
+            for conflict1, conflict2 in strong_conflicts:
+                if ((premise_modal["type"] == conflict1 and query_modal["type"] == conflict2) or
+                    (premise_modal["type"] == conflict2 and query_modal["type"] == conflict1)):
+                    
+                    return {
+                        "confidence": 0.82,
+                        "explanation": f"Modal conflict: {premise_modal['type']} vs {query_modal['type']}",
+                        "details": f"Operators: {premise_modal['operators']} conflicts with {query_modal['operators']}"
+                    }
+        
+        # Check for specific modal word conflicts
+        strong_necessity = {"must", "necessarily", "required", "always"}
+        weak_possibility = {"might", "could", "possibly", "maybe"}
+        
+        premise_strong = any(word in premise["words"] for word in strong_necessity)
+        query_weak = any(word in query["words"] for word in weak_possibility)
+        
+        if premise_strong and query_weak:
+            return {
+                "confidence": 0.78,
+                "explanation": "Strong necessity conflicts with weak possibility",
+                "details": "Necessity operator in premise, possibility operator in query"
+            }
+        
+        return None
+    
+    def _check_temporal_inconsistency_enhanced(self, premise: Dict, query: Dict) -> Optional[Dict]:
+        """Enhanced temporal inconsistency detection."""
+        premise_temporal = premise["temporal"]
+        query_temporal = query["temporal"]
+        premise_causal = premise["causal"]
+        query_causal = query["causal"]
+        
+        # Check for temporal-causal conflicts
+        if premise_temporal["markers"] and query_causal["type"] == "cause":
+            # Look for "before" in premise and "caused" in query
+            if "before" in premise_temporal["markers"]:
+                # Check if query suggests later event caused earlier event
+                return {
+                    "confidence": 0.85,
+                    "explanation": "Temporal-causal inconsistency: later event cannot cause earlier event",
+                    "details": f"Premise temporal: {premise_temporal['markers']}, Query causal: {query_causal['markers']}"
+                }
+        
+        # Direct temporal conflicts
+        temporal_opposites = [
+            ("before", "after"),
+            ("past", "future"), 
+            ("previously", "currently"),
+            ("first", "last")
+        ]
+        
+        for opp1, opp2 in temporal_opposites:
+            if (opp1 in premise_temporal["markers"] and opp2 in query_temporal["markers"]):
+                return {
+                    "confidence": 0.8,
+                    "explanation": f"Temporal contradiction: {opp1} vs {opp2}",
+                    "details": f"Conflicting temporal markers in same context"
+                }
+        
+        return None
+    
+    def _check_context_dependent_contradiction(self, premise: Dict, query: Dict) -> Optional[Dict]:
+        """New: Check for context-dependent contradictions requiring domain knowledge."""
+        
+        # Check for measurement context conflicts
+        if premise["numbers"] and query["numbers"] and premise["units"] and query["units"]:
+            # Same measurement, different contexts might not be contradictory
+            # But check for impossible combinations
+            
+            premise_temp_units = set(premise["units"]) & self.measurement_patterns["temperature"]
+            query_temp_units = set(query["units"]) & self.measurement_patterns["temperature"]
+            
+            if premise_temp_units and query_temp_units:
+                # Temperature measurements - check if physically impossible
+                premise_val = premise["numbers"][0] if premise["numbers"] else 0
+                query_val = query["numbers"][0] if query["numbers"] else 0
+                
+                # Check for physically impossible temperatures
+                if premise_val < -273 or query_val < -273:  # Below absolute zero
+                    return {
+                        "confidence": 0.9,
+                        "explanation": "Physically impossible temperature below absolute zero",
+                        "details": f"Temperature below -273°C is impossible: {premise_val}, {query_val}"
+                    }
+        
+        # Check for logical context switches
+        premise_context_words = {"theory", "practice", "ideal", "real", "abstract", "concrete"}
+        query_context_words = {"theory", "practice", "ideal", "real", "abstract", "concrete"}
+        
+        premise_contexts = set(premise["words"]) & premise_context_words
+        query_contexts = set(query["words"]) & query_context_words
+        
+        context_opposites = {("theory", "practice"), ("ideal", "real"), ("abstract", "concrete")}
+        
+        for ctx1, ctx2 in context_opposites:
+            if ctx1 in premise_contexts and ctx2 in query_contexts:
+                # Not necessarily contradictory, but context-dependent
+                overlap = len(set(premise["words"]) & set(query["words"]))
+                if overlap > 5:  # Discussing same topic
+                    return {
+                        "confidence": 0.65,
+                        "explanation": f"Context-dependent potential contradiction: {ctx1} vs {ctx2} contexts",
+                        "details": f"Same topic discussed in different contexts may have different truth values"
+                    }
+        
+        return None
+    
+    def _analyze_compatibility(self, premise: Dict, query: Dict) -> Dict:
+        """Analyze compatibility when no contradiction is found."""
+        
+        # Calculate semantic overlap
+        premise_words = set(premise["words"])
+        query_words = set(query["words"])
+        overlap = len(premise_words & query_words) / max(len(premise_words), len(query_words))
+        
+        # Check for complementary information
+        complementary_indicators = {
+            "and", "also", "additionally", "furthermore", "moreover", "plus"
+        }
+        
+        has_complementary = any(word in query["words"] for word in complementary_indicators)
+        
+        if overlap > 0.3 and not premise["negations"] and not query["negations"]:
+            confidence = 0.9
+            explanation = f"Statements appear compatible with {overlap:.1%} semantic overlap"
+        elif has_complementary:
+            confidence = 0.95
+            explanation = "Statements appear to provide complementary information"
+        elif overlap < 0.1:
+            confidence = 0.8
+            explanation = "Statements discuss different topics - no contradiction detected"
+        else:
+            confidence = 0.85
+            explanation = "No logical contradiction detected between statements"
+        
+        return {
+            "confidence": confidence,
+            "explanation": explanation
+        }#!/usr/bin/env python3
+"""
+Enhanced AI Training Framework for Contradiction Detection
+Incorporates MBT-inspired logic validation and advanced training techniques
+Supports multiple AI architectures with sophisticated benchmarking
+"""
+
+import json
+import csv
+import random
+import numpy as np
+from typing import List, Dict, Any, Optional, Tuple, Union
+from dataclasses import dataclass, asdict, field
+from pathlib import Path
+from datetime import datetime
+import hashlib
+import logging
+from enum import Enum
+from collections import defaultdict, Counter
+
+# Enhanced contradiction taxonomy inspired by MBT logical validation
+class ContradictionType(Enum):
+    NONE = "None"
+    TYPE_I_DIRECT_NEGATION = "Type I: Direct Negation"
+    TYPE_II_PROPERTY_MISMATCH = "Type II: Property Mismatch"
+    TYPE_III_DEFINITIONAL_VIOLATION = "Type III: Definitional Violation"
+    TYPE_IV_COUNTEREXAMPLE = "Type IV: Counterexample to Universal"
+    TYPE_V_MODAL_CONFLICT = "Type V: Modal Logic Conflict"
+    TYPE_VI_TEMPORAL_INCONSISTENCY = "Type VI: Temporal Inconsistency"
+    TYPE_VII_CONTEXT_DEPENDENT = "Type VII: Context-Dependent Contradiction"
+
+class DifficultyLevel(Enum):
+    TRIVIAL = 1
+    EASY = 2
+    MEDIUM = 3
+    HARD = 4
+    EXPERT = 5
+
+@dataclass
+class LogicalContext:
+    """Enhanced context tracking for logical statements."""
+    domain: str
+    temporal_markers: List[str] = field(default_factory=list)
+    modal_operators: List[str] = field(default_factory=list)
+    quantifiers: List[str] = field(default_factory=list)
+    confidence_level: float = 1.0
+    source_reliability: float = 1.0
+
+@dataclass
+class TrainingExample:
+    """Enhanced training example with richer metadata."""
+    id: str
+    premise: str
+    query: str
+    contradiction_type: ContradictionType
+    explanation: str
+    human_patch: str
+    repair_action: str
+    logical_context: LogicalContext
+    difficulty_level: DifficultyLevel
+    cognitive_load: float = 0.0  # Estimated mental effort required
+    dependency_chain: List[str] = field(default_factory=list)  # Related examples
+    validation_confidence: float = 1.0
+    created_timestamp: datetime = field(default_factory=datetime.now)
+    tags: List[str] = field(default_factory=list)
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary with enum handling."""
+        result = asdict(self)
+        result['contradiction_type'] = self.contradiction_type.value
+        result['difficulty_level'] = self.difficulty_level.value
+        result['created_timestamp'] = self.created_timestamp.isoformat()
+        return result
+
+@dataclass  
+class AIBenchmarkResult:
+    """Enhanced benchmark results with detailed analytics."""
+    system_name: str
+    version: str
+    test_date: str
+    accuracy: float
+    precision_by_type: Dict[str, float]
+    recall_by_type: Dict[str, float]
+    f1_by_type: Dict[str, float]
+    processing_time: float
+    examples_tested: int
+    calibration_error: float = 0.0  # How well confidence matches accuracy
+    consistency_score: float = 0.0  # Consistency across similar examples
+    robustness_score: float = 0.0  # Performance on adversarial examples
+    error_analysis: Dict[str, List[str]] = field(default_factory=dict)
+    confidence_distribution: Dict[str, List[float]] = field(default_factory=dict)
+
+class MBTLogicValidator:
+    """
+    MBT-inspired logic validation system.
+    Implements sophisticated contradiction detection using geometric reasoning principles.
+    Enhanced based on self-testing and analysis.
+    """
+    
+    def __init__(self):
+        self.knowledge_base = {
+            "is_a": {
+                "platypus": "mammal", "echidna": "mammal", "bat": "mammal", 
+                "dolphin": "mammal", "human": "mammal", "cat": "mammal", 
+                "dog": "mammal", "whale": "mammal", "penguin": "bird",
+                "ostrich": "bird", "emu": "bird", "triangle": "shape", 
+                "square": "shape", "circle": "shape", "electron": "particle", 
+                "proton": "particle", "water": "substance", "alcohol": "substance"
+            },
+            "properties": {
+                "mammal": ["warm_blooded", "vertebrate", "hair_or_fur", "give_live_birth"],
+                "bird": ["warm_blooded", "vertebrate", "feathers", "lay_eggs", "can_fly"],
+                "shape": ["has_dimensions", "geometric"],
+                "triangle": ["three_sides", "three_angles"],
+                "substance": ["has_physical_properties", "measurable"],
+                "particle": ["has_mass", "has_charge_or_neutral"]
+            },
+            "exceptions": {
+                "platypus": ["lays_eggs", "has_bill", "venomous"],
+                "echidna": ["lays_eggs", "has_spines"], 
+                "bat": ["can_fly", "nocturnal"],
+                "whale": ["lives_in_water", "very_large"],
+                "penguin": ["cannot_fly", "swims", "lives_in_cold"],
+                "ostrich": ["cannot_fly", "very_large", "runs_fast"],
+                "emu": ["cannot_fly", "runs_fast"]
+            },
+            "physical_properties": {
+                "water": {"boiling_point": "100C", "freezing_point": "0C"},
+                "alcohol": {"boiling_point": "78C", "freezing_point": "-114C"}
+            }
+        }
+        
+        # Enhanced logical operators with strength indicators
+        self.logical_operators = {
+            "universal": {"all", "every", "each", "always", "invariably"},
+            "negative_universal": {"no", "none", "never", "nothing"},
+            "existential": {"some", "many", "few", "sometimes", "occasionally"},
+            "majority": {"most", "usually", "typically", "generally", "often"},
+            "weak": {"might", "could", "perhaps", "possibly", "maybe"},
+            "strong": {"must", "should", "will", "definitely", "certainly"}
+        }
+        
+        self.temporal_markers = {
+            "before": "precedence", "after": "succession", "during": "simultaneity",
+            "while": "simultaneity", "when": "temporal_condition", 
+            "then": "sequence", "previously": "past", "currently": "present", 
+            "future": "future", "past": "past", "present": "present",
+            "first": "sequence", "next": "sequence", "finally": "sequence"
+        }
+        
+        self.modal_operators = {
+            "necessity": {"must", "necessarily", "required", "essential", "always"},
+            "possibility": {"could", "might", "possibly", "perhaps", "maybe"},
+            "probability": {"probably", "likely", "unlikely", "certainly"},
+            "permission": {"may", "allowed", "permitted", "can"},
+            "obligation": {"should", "ought", "supposed to", "expected"}
+        }
+        
+        # Causal relationship markers
+        self.causal_markers = {
+            "cause": {"because", "since", "due to", "caused by", "results from"},
+            "effect": {"therefore", "thus", "consequently", "results in", "leads to"},
+            "correlation": {"associated with", "related to", "connected to"}
+        }
+        
+        # Numerical/measurement patterns
+        self.measurement_patterns = {
+            "temperature": {"C", "F", "K", "celsius", "fahrenheit", "kelvin"},
+            "distance": {"m", "km", "miles", "feet", "inches", "meters"},
+            "time": {"seconds", "minutes", "hours", "days", "years"},
+            "weight": {"kg", "pounds", "grams", "tons"}
+        }
+    
+    def parse_statement(self, statement: str) -> Dict[str, Any]:
+        """Enhanced statement parsing with deep logical analysis."""
+        words = statement.lower().split()
+        
+        # Extract numerical values
+        numbers = []
+        units = []
+        for word in words:
+            # Check for numbers
+            try:
+                if word.replace('.', '').replace('-', '').isdigit():
+                    numbers.append(float(word))
+                elif word[:-1].replace('.', '').replace('-', '').isdigit():
+                    # Number with unit (like "100C")
+                    numbers.append(float(word[:-1]))
+                    units.append(word[-1])
+            except:
+                pass
+            
+            # Check for units
+            for unit_type, unit_set in self.measurement_patterns.items():
+                if word in unit_set:
+                    units.append(word)
+        
+        # Enhanced logical operator detection
+        quantifier_info = {"type": None, "strength": 0}
+        for op_type, op_set in self.logical_operators.items():
+            found_ops = [w for w in words if w in op_set]
+            if found_ops:
+                quantifier_info["type"] = op_type
+                quantifier_info["strength"] = len(found_ops)
+                break
+        
+        # Modal operator analysis
+        modal_info = {"type": None, "operators": []}
+        for modal_type, modal_set in self.modal_operators.items():
+            found_modals = [w for w in words if w in modal_set]
+            if found_modals:
+                modal_info["type"] = modal_type
+                modal_info["operators"] = found_modals
+        
+        # Temporal analysis
+        temporal_info = {"markers": [], "type": None}
+        for word in words:
+            if word in self.temporal_markers:
+                temporal_info["markers"].append(word)
+                temporal_info["type"] = self.temporal_markers[word]
+        
+        # Causal analysis
+        causal_info = {"type": None, "markers": []}
+        for causal_type, causal_set in self.causal_markers.items():
+            for phrase in causal_set:
+                if phrase in statement.lower():
+                    causal_info["type"] = causal_type
+                    causal_info["markers"].append(phrase)
+        
+        # Subject/object extraction (enhanced)
+        entities = []
+        for word in words:
+            if word in self.knowledge_base["is_a"]:
+                entities.append(word)
+        
+        parsed = {
+            "raw": statement,
+            "words": words,
+            "numbers": numbers,
+            "units": units,
+            "entities": entities,
+            "quantifier": quantifier_info,
+            "modal": modal_info,
+            "temporal": temporal_info,
+            "causal": causal_info,
+            "negations": [w for w in words if w in ["not", "no", "never", "false", "cannot", "does not", "do not"]],
+            "subjects": [],
+            "predicates": [],
+            "confidence_indicators": [w for w in words if w in ["definitely", "certainly", "probably", "possibly", "maybe"]]
+        }
+        
+        # Enhanced subject/predicate extraction
+        for i, word in enumerate(words):
+            if word in self.knowledge_base["is_a"]:
+                parsed["subjects"].append(word)
+            
+            # Look for property assertions
+            for entity, props in self.knowledge_base["properties"].items():
+                for prop in props:
+                    if prop.replace("_", " ") in statement.lower():
+                        parsed["predicates"].append(prop)
+        
+        return parsed
+    
+    def validate_contradiction(self, premise: str, query: str) -> Dict[str, Any]:
+        """
+        MBT-inspired contradiction validation using geometric logic principles.
+        """
+        premise_parsed = self.parse_statement(premise)
+        query_parsed = self.parse_statement(query)
+        
+        # Type I: Direct Negation Detection
+        if self._check_direct_negation(premise_parsed, query_parsed):
+            return {
+                "type": ContradictionType.TYPE_I_DIRECT_NEGATION,
+                "confidence": 0.95,
+                "explanation": "Direct logical negation detected",
+                "repair": "Resolve negation or check context",
+                "mbt_reasoning": "Motion field inversion - opposite curvature directions"
+            }
+        
+        # Type II: Property Mismatch
+        property_conflict = self._check_property_mismatch(premise_parsed, query_parsed)
+        if property_conflict:
+            return {
+                "type": ContradictionType.TYPE_II_PROPERTY_MISMATCH,
+                "confidence": 0.85,
+                "explanation": f"Property conflict: {property_conflict}",
+                "repair": "Clarify property context or measurement conditions",
+                "mbt_reasoning": "Curvature field incompatible configurations"
+            }
+        
+        # Type III: Definitional Violation
+        def_violation = self._check_definitional_violation(premise_parsed, query_parsed)
+        if def_violation:
+            return {
+                "type": ContradictionType.TYPE_III_DEFINITIONAL_VIOLATION,
+                "confidence": 0.90,
+                "explanation": f"Definition violated: {def_violation}",
+                "repair": "Maintain definition or reclassify object",
+                "mbt_reasoning": "Essential geometric constraints violated"
+            }
+        
+        # Type IV: Counterexample to Universal
+        counterex = self._check_counterexample(premise_parsed, query_parsed)
+        if counterex:
+            return {
+                "type": ContradictionType.TYPE_IV_COUNTEREXAMPLE,
+                "confidence": 0.80,
+                "explanation": f"Counterexample found: {counterex}",
+                "repair": "Add exceptions or weaken quantifier",
+                "mbt_reasoning": "Universal field pattern has singular exception"
+            }
+        
+        # Type V: Modal Logic Conflict
+        modal_conflict = self._check_modal_conflict(premise_parsed, query_parsed)
+        if modal_conflict:
+            return {
+                "type": ContradictionType.TYPE_V_MODAL_CONFLICT,
+                "confidence": 0.75,
+                "explanation": f"Modal operators conflict: {modal_conflict}",
+                "repair": "Clarify necessity/possibility relationships",
+                "mbt_reasoning": "Probability field interference patterns"
+            }
+        
+        # Type VI: Temporal Inconsistency
+        temporal_issue = self._check_temporal_inconsistency(premise_parsed, query_parsed)
+        if temporal_issue:
+            return {
+                "type": ContradictionType.TYPE_VI_TEMPORAL_INCONSISTENCY,
+                "confidence": 0.70,
+                "explanation": f"Temporal inconsistency: {temporal_issue}",
+                "repair": "Clarify timeline or sequence of events",
+                "mbt_reasoning": "Time geometry curvature contradiction"
+            }
+        
+        return {
+            "type": ContradictionType.NONE,
+            "confidence": 0.95,
+            "explanation": "No contradiction detected",
+            "repair": "N/A",
+            "mbt_reasoning": "Geometric fields are compatible"
+        }
+    
+    def _check_direct_negation(self, premise: Dict, query: Dict) -> bool:
+        """Check for direct logical negation."""
+        premise_negated = bool(premise["negations"])
+        query_negated = bool(query["negations"])
+        
+        # Look for same predicates with opposite truth values
+        common_predicates = set(premise["predicates"]) & set(query["predicates"])
+        common_subjects = set(premise["subjects"]) & set(query["subjects"])
+        
+        return (common_predicates and common_subjects and 
+                premise_negated != query_negated)
+    
+    def _check_property_mismatch(self, premise: Dict, query: Dict) -> Optional[str]:
+        """Check for property value conflicts."""
+        # Look for numerical conflicts
+        premise_nums = [w for w in premise["words"] if w.replace('.', '').replace('-', '').isdigit()]
+        query_nums = [w for w in query["words"] if w.replace('.', '').replace('-', '').isdigit()]
+        
+        if premise_nums and query_nums and premise_nums != query_nums:
+            return f"Numerical mismatch: {premise_nums} vs {query_nums}"
+        
+        return None
+    
+    def _check_definitional_violation(self, premise: Dict, query: Dict) -> Optional[str]:
+        """Check for definitional contradictions."""
+        for subject in query["subjects"]:
+            if subject in self.knowledge_base["is_a"]:
+                category = self.knowledge_base["is_a"][subject]
+                if category in self.knowledge_base["properties"]:
+                    essential_props = self.knowledge_base["properties"][category]
+                    
+                    for prop in essential_props:
+                        if prop in premise["words"] and query["negations"]:
+                            return f"{subject} cannot lack essential property {prop}"
+        
+        return None
+    
+    def _check_counterexample(self, premise: Dict, query: Dict) -> Optional[str]:
+        """Check for counterexamples to universal claims."""
+        if any(q in premise["quantifiers"] for q in ["all", "every", "each"]):
+            # Universal claim in premise
+            for subject in query["subjects"]:
+                if subject in self.knowledge_base["exceptions"]:
+                    exceptions = self.knowledge_base["exceptions"][subject]
+                    for exception_prop in exceptions:
+                        if any(prop in query["words"] for prop in premise["predicates"]):
+                            return f"{subject} is known exception"
+        
+        return None
+    
+    def _check_modal_conflict(self, premise: Dict, query: Dict) -> Optional[str]:
+        """Check for modal operator conflicts."""
+        premise_modals = premise["modal_operators"]
+        query_modals = query["modal_operators"]
+        
+        # Strong necessity vs possibility conflicts
+        if ("must" in premise_modals or "necessarily" in premise_modals) and \
+           ("might" in query_modals or "possibly" in query_modals):
+            return "Necessity conflicts with possibility"
+        
+        return None
+    
+    def _check_temporal_inconsistency(self, premise: Dict, query: Dict) -> Optional[str]:
+        """Check for temporal logic inconsistencies."""
+        premise_temporal = premise["temporal_markers"]
+        query_temporal = query["temporal_markers"]
+        
+        # Simple temporal conflict detection
+        if ("before" in premise_temporal and "after" in query_temporal) or \
+           ("past" in premise_temporal and "future" in query_temporal):
+            return "Temporal sequence conflict"
+        
+        return None
+
+class AdvancedTrainingDataGenerator:
+    """
+    Enhanced training data generation with sophisticated synthesis capabilities.
+    """
+    
+    def __init__(self):
+        self.training_examples = []
+        self.validator = MBTLogicValidator()
+        self.synthetic_templates = self._load_synthesis_templates()
+        
+        # Advanced linguistic patterns
+        self.linguistic_patterns = {
+            "causal": ["because", "since", "due to", "results in", "causes"],
+            "comparative": ["more than", "less than", "compared to", "versus"],
+            "conditional": ["if", "then", "unless", "provided that", "assuming"],
+            "evidential": ["according to", "evidence shows", "studies indicate"]
+        }
+    
+    def _load_synthesis_templates(self) -> Dict[str, List[Dict]]:
+        """Load sophisticated templates for synthetic example generation."""
+        return {
+            "property_mismatch": [
+                {
+                    "premise": "At {condition}, {substance} {property} at {value1} {unit}",
+                    "query": "{substance} {property} at {value2} {unit} when {condition}",
+                    "variables": {
+                        "condition": ["sea level", "high altitude", "standard pressure"],
+                        "substance": ["water", "alcohol", "mercury", "oil"],
+                        "property": ["boils", "freezes", "melts"],
+                        "value1": [100, 0, 50, 212],
+                        "value2": [95, 5, 45, 200],
+                        "unit": ["°C", "°F", "K"]
+                    }
+                }
+            ],
+            "definitional_violation": [
+                {
+                    "premise": "{category} have exactly {property}",
+                    "query": "This {instance} does not have {property}",
+                    "variables": {
+                        "category": ["triangles", "mammals", "electrons"],
+                        "instance": ["triangle", "mammal", "electron"],
+                        "property": ["three sides", "backbone", "negative charge"]
+                    }
+                }
+            ],
+            "modal_conflict": [
+                {
+                    "premise": "{entity} must {action} because {reason}",
+                    "query": "{entity} might not {action} under {condition}",
+                    "variables": {
+                        "entity": ["students", "drivers", "employees"],
+                        "action": ["attend classes", "follow traffic laws", "meet deadlines"],
+                        "reason": ["it's required", "it's the law", "it's policy"],
+                        "condition": ["special circumstances", "emergencies", "exceptions"]
+                    }
+                }
+            ],
+            "temporal_inconsistency": [
+                {
+                    "premise": "{event1} happened before {event2}",
+                    "query": "{event2} caused {event1}",
+                    "variables": {
+                        "event1": ["the meeting", "the announcement", "the decision"],
+                        "event2": ["the vote", "the discussion", "the proposal"]
+                    }
+                }
+            ]
+        }
+    
+    def generate_enhanced_synthetic_examples(self, count: int = 100, 
+                                           difficulty_distribution: Dict[DifficultyLevel, float] = None) -> List[TrainingExample]:
+        """Generate synthetic examples with controlled difficulty distribution."""
+        
+        if difficulty_distribution is None:
+            difficulty_distribution = {
+                DifficultyLevel.EASY: 0.3,
+                DifficultyLevel.MEDIUM: 0.4,
+                DifficultyLevel.HARD: 0.2,
+                DifficultyLevel.EXPERT: 0.1
+            }
+        
+        synthetic_examples = []
+        
+        for i in range(count):
+            # Select difficulty level
+            difficulty = np.random.choice(
+                list(difficulty_distribution.keys()),
+                p=list(difficulty_distribution.values())
+            )
+            
+            # Select template category
+            template_category = random.choice(list(self.synthetic_templates.keys()))
+            template = random.choice(self.synthetic_templates[template_category])
+            
+            # Generate variable substitutions
+            substitutions = {}
+            for var, options in template["variables"].items():
+                substitutions[var] = random.choice(options)
+            
+            try:
+                premise = template["premise"].format(**substitutions)
+                query = template["query"].format(**substitutions)
+                
+                # Validate with MBT logic validator
+                validation_result = self.validator.validate_contradiction(premise, query)
+                
+                # Create logical context
+                context = LogicalContext(
+                    domain=template_category,
+                    temporal_markers=[],  # Could be extracted from text
+                    modal_operators=[],   # Could be extracted from text
+                    quantifiers=[]       # Could be extracted from text
+                )
+                
+                example = TrainingExample(
+                    id=f"synthetic_{i:04d}_{template_category}",
+                    premise=premise,
+                    query=query,
+                    contradiction_type=validation_result["type"],
+                    explanation=validation_result["explanation"],
+                    human_patch=f"MBT Analysis: {validation_result['mbt_reasoning']}",
+                    repair_action=validation_result["repair"],
+                    logical_context=context,
+                    difficulty_level=difficulty,
+                    cognitive_load=self._estimate_cognitive_load(premise, query, difficulty),
+                    validation_confidence=validation_result["confidence"],
+                    tags=[template_category, "synthetic", "mbt_validated"]
+                )
+                
+                synthetic_examples.append(example)
+                
+            except (KeyError, ValueError) as e:
+                logging.warning(f"Failed to generate example {i}: {e}")
+                continue
+        
+        self.training_examples.extend(synthetic_examples)
+        return synthetic_examples
+    
+    def _estimate_cognitive_load(self, premise: str, query: str, difficulty: DifficultyLevel) -> float:
+        """Estimate cognitive load required to process this example."""
+        base_load = {
+            DifficultyLevel.TRIVIAL: 0.1,
+            DifficultyLevel.EASY: 0.3,
+            DifficultyLevel.MEDIUM: 0.5,
+            DifficultyLevel.HARD: 0.8,
+            DifficultyLevel.EXPERT: 1.0
+        }[difficulty]
+        
+        # Adjust for text complexity
+        text_complexity = (len(premise.split()) + len(query.split())) / 20
+        logical_complexity = len(set(premise.split()) & set(query.split())) / 10
+        
+        return min(1.0, base_load + text_complexity * 0.1 + logical_complexity * 0.1)
+    
+    def create_adversarial_examples(self, base_examples: List[TrainingExample], 
+                                  perturbation_strength: float = 0.3) -> List[TrainingExample]:
+        """Create adversarial examples to test model robustness."""
+        adversarial_examples = []
+        
+        perturbations = [
+            self._synonym_substitution,
+            self._sentence_restructuring,
+            self._negation_insertion,
+            self._quantifier_modification,
+            self._temporal_shifting
+        ]
+        
+        for base_example in base_examples:
+            for perturbation in perturbations:
+                try:
+                    perturbed = perturbation(base_example, perturbation_strength)
+                    if perturbed:
+                        perturbed.id = f"{base_example.id}_adv_{perturbation.__name__}"
+                        perturbed.tags.append("adversarial")
+                        adversarial_examples.append(perturbed)
+                except Exception as e:
+                    logging.warning(f"Perturbation failed: {e}")
+                    continue
+        
+        return adversarial_examples
+    
+    def _synonym_substitution(self, example: TrainingExample, strength: float) -> Optional[TrainingExample]:
+        """Apply synonym substitution perturbation."""
+        synonyms = {
+            "large": ["big", "huge", "enormous", "massive"],
+            "small": ["tiny", "little", "miniature", "minute"],
+            "fast": ["quick", "rapid", "swift", "speedy"],
+            "slow": ["sluggish", "gradual", "leisurely"]
+        }
+        
+        # Simple implementation - in practice would use more sophisticated NLP
+        perturbed_premise = example.premise
+        perturbed_query = example.query
+        
+        for original, alternatives in synonyms.items():
+            if original in example.premise.lower() and random.random() < strength:
+                replacement = random.choice(alternatives)
+                perturbed_premise = perturbed_premise.replace(original, replacement)
+        
+        if perturbed_premise != example.premise:
+            # Create new example with perturbation
+            new_example = TrainingExample(
+                id=f"{example.id}_syn",
+                premise=perturbed_premise,
+                query=perturbed_query,
+                contradiction_type=example.contradiction_type,
+                explanation=example.explanation + " [synonym perturbation]",
+                human_patch=example.human_patch,
+                repair_action=example.repair_action,
+                logical_context=example.logical_context,
+                difficulty_level=example.difficulty_level,
+                tags=example.tags + ["synonym_perturbation"]
+            )
+            return new_example
+        
+        return None
+    
+    def _sentence_restructuring(self, example: TrainingExample, strength: float) -> Optional[TrainingExample]:
+        """Apply sentence restructuring perturbation."""
+        # Simplified implementation - would use more sophisticated parsing
+        if random.random() < strength and "," in example.premise:
+            parts = example.premise.split(",")
+            if len(parts) == 2:
+                restructured = f"{parts[1].strip()}, {parts[0].strip()}"
+                
+                new_example = TrainingExample(
+                    id=f"{example.id}_restructure",
+                    premise=restructured,
+                    query=example.query,
+                    contradiction_type=example.contradiction_type,
+                    explanation=example.explanation + " [restructuring perturbation]",
+                    human_patch=example.human_patch,
+                    repair_action=example.repair_action,
+                    logical_context=example.logical_context,
+                    difficulty_level=example.difficulty_level,
+                    tags=example.tags + ["restructuring_perturbation"]
+                )
+                return new_example
+        
+        return None
+    
+    def _negation_insertion(self, example: TrainingExample, strength: float) -> Optional[TrainingExample]:
+        """Insert double negations to test logical reasoning."""
+        if random.random() < strength and "not" not in example.query.lower():
+            # Insert double negation: "X is true" -> "X is not false"
+            perturbed_query = example.query.replace(" is ", " is not not ")
+            
+            new_example = TrainingExample(
+                id=f"{example.id}_negation",
+                premise=example.premise,
+                query=perturbed_query,
+                contradiction_type=example.contradiction_type,
+                explanation=example.explanation + " [double negation]",
+                human_patch=example.human_patch,
+                repair_action=example.repair_action,
+                logical_context=example.logical_context,
+                difficulty_level=example.difficulty_level,
+                tags=example.tags + ["negation_perturbation"]
+            )
+            return new_example
+        
+        return None
+    
+    def _quantifier_modification(self, example: TrainingExample, strength: float) -> Optional[TrainingExample]:
+        """Modify quantifiers to test logical precision."""
+        quantifier_map = {
+            "all": "most", "every": "many", "no": "few",
+            "always": "usually", "never": "rarely"
+        }
+        
+        if random.random() < strength:
+            perturbed_premise = example.premise
+            for original, replacement in quantifier_map.items():
+                if original in example.premise.lower():
+                    perturbed_premise = example.premise.replace(original, replacement)
+                    break
+            
+            if perturbed_premise != example.premise:
+                # Quantifier change might affect contradiction type
+                validation_result = self.validator.validate_contradiction(perturbed_premise, example.query)
+                
+                new_example = TrainingExample(
+                    id=f"{example.id}_quantifier",
+                    premise=perturbed_premise,
+                    query=example.query,
+                    contradiction_type=validation_result["type"],
+                    explanation=validation_result["explanation"] + " [quantifier modification]",
+                    human_patch=example.human_patch,
+                    repair_action=validation_result["repair"],
+                    logical_context=example.logical_context,
+                    difficulty_level=example.difficulty_level,
+                    tags=example.tags + ["quantifier_perturbation"]
+                )
+                return new_example
+        
+        return None
+    
+    def _temporal_shifting(self, example: TrainingExample, strength: float) -> Optional[TrainingExample]:
+        """Apply temporal context shifts."""
+        temporal_shifts = {
+            "currently": "previously", "now": "then", "today": "yesterday",
+            "present": "past", "is": "was", "are": "were"
+        }
+        
+        if random.random() < strength:
+            perturbed_premise = example.premise
+            for original, replacement in temporal_shifts.items():
+                if original in example.premise.lower():
+                    perturbed_premise = example.premise.replace(original, replacement)
+                    break
+            
+            if perturbed_premise != example.premise:
+                new_example = TrainingExample(
+                    id=f"{example.id}_temporal",
+                    premise=perturbed_premise,
+                    query=example.query,
+                    contradiction_type=example.contradiction_type,
+                    explanation=example.explanation + " [temporal shift]",
+                    human_patch=example.human_patch,
+                    repair_action=example.repair_action,
+                    logical_context=example.logical_context,
+                    difficulty_level=example.difficulty_level,
+                    tags=example.tags + ["temporal_perturbation"]
+                )
+                return new_example
+        
+        return None
+
+class EnhancedAIBenchmarker:
+    """
+    Advanced benchmarking system with detailed analytics and robustness testing.
+    """
+    
+    def __init__(self):
+        self.benchmark_results = []
+        self.test_suites = {}
+        
+    def create_comprehensive_test_suite(self, 
+                                      base_examples: List[TrainingExample],
+                                      include_adversarial: bool = True,
+                                      adversarial_ratio: float = 0.3) -> Dict[str, List[TrainingExample]]:
+        """Create comprehensive test suite with multiple evaluation dimensions."""
+        
+        test_suite = {
+            "standard": base_examples,
+            "easy": [ex for ex in base_examples if ex.difficulty_level in [DifficultyLevel.TRIVIAL, DifficultyLevel.EASY]],
+            "hard": [ex for ex in base_examples if ex.difficulty_level in [DifficultyLevel.HARD, DifficultyLevel.EXPERT]],
+            "by_type": defaultdict(list)
+        }
+        
+        # Group by contradiction type
+        for example in base_examples:
+            test_suite["by_type"][example.contradiction_type.value].append(example)
+        
+        # Add adversarial examples if requested
+        if include_adversarial:
+            generator = AdvancedTrainingDataGenerator()
+            adversarial_count = int(len(base_examples) * adversarial_ratio)
+            sample_for_adversarial = random.sample(base_examples, min(50, len(base_examples)))
+            adversarial_examples = generator.create_adversarial_examples(sample_for_adversarial)
+            test_suite["adversarial"] = adversarial_examples[:adversarial_count]
+        
+        self.test_suites = test_suite
+        return test_suite
+    
+    def benchmark_with_confidence_calibration(self,
+                                            system_name: str,
+                                            system_version: str,
+                                            prediction_function: callable,
+                                            confidence_function: Optional[callable] = None,
+                                            test_suite_name: str = "standard") -> AIBenchmarkResult:
+        """
+        Enhanced benchmarking with confidence calibration analysis.
+        
+        Args:
+            prediction_function: Function (premise, query) -> contradiction_type
+            confidence_function: Function (premise, query) -> confidence_score
+        """
+        
+        if test_suite_name not in self.test_suites:
+            raise ValueError(f"Test suite '{test_suite_name}' not found")
+        
+        test_examples = self.test_suites[test_suite_name]
+        if not test_examples:
+            raise ValueError("No test examples available")
+        
+        predictions = []
+        confidences = []
+        processing_times = []
+        error_details = defaultdict(list)
+        
+        for example in test_examples:
+            import time
+            start_time = time.time()
+            
+            try:
+                # Get prediction
+                predicted_type = prediction_function(example.premise, example.query)
+                processing_time = time.time() - start_time
+                processing_times.append(processing_time)
+                
+                # Get confidence if function provided
+                if confidence_function:
+                    confidence = confidence_function(example.premise, example.query)
+                    confidences.append(confidence)
+                else:
+                    confidences.append(1.0)  # Default confidence
+                
+                predictions.append({
+                    'example_id': example.id,
+                    'predicted': predicted_type,
+                    'actual': example.contradiction_type.value,
+                    'correct': predicted_type == example.contradiction_type.value,
+                    'confidence': confidences[-1],
+                    'processing_time': processing_time
+                })
+                
+                # Track errors by type
+                if predicted_type != example.contradiction_type.value:
+                    error_details[example.contradiction_type.value].append({
+                        'example_id': example.id,
+                        'predicted': predicted_type,
+                        'premise': example.premise,
+                        'query': example.query,
+                        'confidence': confidences[-1]
+                    })
+                    
+            except Exception as e:
+                logging.error(f"Error processing example {example.id}: {e}")
+                processing_times.append(0.0)
+                confidences.append(0.0)
+                predictions.append({
+                    'example_id': example.id,
+                    'predicted': 'ERROR',
+                    'actual': example.contradiction_type.value,
+                    'correct': False,
+                    'confidence': 0.0,
+                    'processing_time': 0.0
+                })
+        
+        # Calculate comprehensive metrics
+        correct_predictions = sum(1 for p in predictions if p['correct'])
+        accuracy = correct_predictions / len(predictions) if predictions else 0.0
+        
+        # Precision, Recall, F1 by type
+        precision_by_type = {}
+        recall_by_type = {}
+        f1_by_type = {}
+        
+        # Get all unique types
+        all_types = set()
+        for p in predictions:
+            all_types.add(p['predicted'])
+            all_types.add(p['actual'])
+        all_types.discard('ERROR')
+        
+        for ctype in all_types:
+            tp = sum(1 for p in predictions if p['predicted'] == ctype and p['actual'] == ctype)
+            fp = sum(1 for p in predictions if p['predicted'] == ctype and p['actual'] != ctype)
+            fn = sum(1 for p in predictions if p['predicted'] != ctype and p['actual'] == ctype)
+            
+            precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
+            recall = tp / (tp + fn) if (tp + fn) > 0 else 0.0
+            f1 = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0.0
+            
+            precision_by_type[ctype] = precision
+            recall_by_type[ctype] = recall
+            f1_by_type[ctype] = f1
+        
+        # Calibration error calculation
+        calibration_error = self._calculate_calibration_error(predictions)
+        
+        # Consistency score calculation
+        consistency_score = self._calculate_consistency_score(predictions, test_examples)
+        
+        # Robustness score (if adversarial examples available)
+        robustness_score = 0.0
+        if test_suite_name == "adversarial":
+            robustness_score = accuracy  # Simple metric - could be more sophisticated
+        
+        # Confidence distribution by type
+        confidence_distribution = defaultdict(list)
+        for p in predictions:
+            confidence_distribution[p['actual']].append(p['confidence'])
+        
+        result = AIBenchmarkResult(
+            system_name=system_name,
+            version=system_version,
+            test_date=datetime.now().isoformat(),
+            accuracy=accuracy,
+            precision_by_type=precision_by_type,
+            recall_by_type=recall_by_type,
+            f1_by_type=f1_by_type,
+            processing_time=sum(processing_times) / len(processing_times) if processing_times else 0.0,
+            examples_tested=len(predictions),
+            calibration_error=calibration_error,
+            consistency_score=consistency_score,
+            robustness_score=robustness_score,
+            error_analysis=dict(error_details),
+            confidence_distribution=dict(confidence_distribution)
+        )
+        
+        self.benchmark_results.append(result)
+        return result
+    
+    def _calculate_calibration_error(self, predictions: List[Dict]) -> float:
+        """Calculate Expected Calibration Error (ECE)."""
+        if not predictions:
+            return 0.0
+        
+        # Bin predictions by confidence
+        bins = np.linspace(0, 1, 11)  # 10 bins
+        bin_boundaries = [(bins[i], bins[i+1]) for i in range(len(bins)-1)]
+        
+        total_error = 0.0
+        total_samples = len(predictions)
+        
+        for bin_lower, bin_upper in bin_boundaries:
+            bin_predictions = [p for p in predictions 
+                             if bin_lower <= p['confidence'] < bin_upper]
+            
+            if not bin_predictions:
+                continue
+            
+            bin_accuracy = sum(p['correct'] for p in bin_predictions) / len(bin_predictions)
+            bin_confidence = sum(p['confidence'] for p in bin_predictions) / len(bin_predictions)
+            bin_weight = len(bin_predictions) / total_samples
+            
+            total_error += bin_weight * abs(bin_accuracy - bin_confidence)
+        
+        return total_error
+    
+    def _calculate_consistency_score(self, predictions: List[Dict], 
+                                   test_examples: List[TrainingExample]) -> float:
+        """Calculate consistency across similar examples."""
+        if len(predictions) < 2:
+            return 1.0
+        
+        # Group similar examples (same contradiction type, similar difficulty)
+        example_groups = defaultdict(list)
+        for i, example in enumerate(test_examples):
+            key = f"{example.contradiction_type.value}_{example.difficulty_level.value}"
+            example_groups[key].append(i)
+        
+        consistency_scores = []
+        
+        for group_indices in example_groups.values():
+            if len(group_indices) < 2:
+                continue
+            
+            group_predictions = [predictions[i]['predicted'] for i in group_indices]
+            # Calculate agreement within group
+            most_common = Counter(group_predictions).most_common(1)[0][1]
+            agreement_rate = most_common / len(group_predictions)
+            consistency_scores.append(agreement_rate)
+        
+        return sum(consistency_scores) / len(consistency_scores) if consistency_scores else 1.0
+    
+    def generate_detailed_report(self, result: AIBenchmarkResult) -> str:
+        """Generate comprehensive analysis report."""
+        
+        report = f"""
+# 🧠 AI Contradiction Detection Benchmark Report
+**System:** {result.system_name} v{result.version}
+**Test Date:** {result.test_date}
+**Examples Tested:** {result.examples_tested}
+
+## 📊 Overall Performance
+- **Accuracy:** {result.accuracy:.2%}
+- **Average Processing Time:** {result.processing_time:.4f}s per example
+- **Calibration Error:** {result.calibration_error:.3f}
+- **Consistency Score:** {result.consistency_score:.3f}
+- **Robustness Score:** {result.robustness_score:.3f}
+
+## 🎯 Performance by Contradiction Type
+
+| Type | Precision | Recall | F1-Score |
+|------|-----------|--------|----------|
+"""
+        
+        for ctype in sorted(result.precision_by_type.keys()):
+            precision = result.precision_by_type.get(ctype, 0.0)
+            recall = result.recall_by_type.get(ctype, 0.0)
+            f1 = result.f1_by_type.get(ctype, 0.0)
+            report += f"| {ctype} | {precision:.3f} | {recall:.3f} | {f1:.3f} |\n"
+        
+        report += f"""
+## 🔍 Error Analysis
+**Total Errors:** {result.examples_tested - int(result.accuracy * result.examples_tested)}
+
+### Most Common Error Patterns:
+"""
+        
+        # Analyze error patterns
+        error_patterns = defaultdict(int)
+        for actual_type, errors in result.error_analysis.items():
+            for error in errors:
+                pattern = f"{actual_type} → {error['predicted']}"
+                error_patterns[pattern] += 1
+        
+        for pattern, count in sorted(error_patterns.items(), key=lambda x: x[1], reverse=True)[:5]:
+            report += f"- **{pattern}:** {count} cases\n"
+        
+        report += f"""
+## 📈 Confidence Analysis
+Average confidence scores by actual type:
+"""
+        
+        for ctype, confidences in result.confidence_distribution.items():
+            if confidences:
+                avg_confidence = sum(confidences) / len(confidences)
+                report += f"- **{ctype}:** {avg_confidence:.3f}\n"
+        
+        if result.calibration_error > 0.1:
+            report += f"""
+## ⚠️ Calibration Issues Detected
+The system shows poor calibration (ECE: {result.calibration_error:.3f}).
+This means the confidence scores don't match actual accuracy.
+**Recommendation:** Consider confidence score recalibration.
+"""
+        
+        if result.consistency_score < 0.8:
+            report += f"""
+## ⚠️ Consistency Issues Detected
+The system shows inconsistent predictions on similar examples ({result.consistency_score:.3f}).
+**Recommendation:** Additional training on consistent logical reasoning.
+"""
+        
+        return report
+
+class MBTInspiredTrainingPipeline:
+    """
+    Complete training pipeline inspired by MBT geometric reasoning principles.
+    """
+    
+    def __init__(self):
+        self.generator = AdvancedTrainingDataGenerator()
+        self.benchmarker = EnhancedAIBenchmarker()
+        self.validator = MBTLogicValidator()
+        
+    def create_curriculum_learning_sequence(self, 
+                                          base_examples: List[TrainingExample],
+                                          synthetic_count: int = 500) -> Dict[str, List[TrainingExample]]:
+        """Create curriculum learning sequence from easy to hard examples."""
+        
+        # Generate synthetic examples with controlled difficulty
+        difficulty_distributions = [
+            {DifficultyLevel.EASY: 0.8, DifficultyLevel.MEDIUM: 0.2},  # Stage 1
+            {DifficultyLevel.EASY: 0.4, DifficultyLevel.MEDIUM: 0.5, DifficultyLevel.HARD: 0.1},  # Stage 2
+            {DifficultyLevel.MEDIUM: 0.5, DifficultyLevel.HARD: 0.4, DifficultyLevel.EXPERT: 0.1}  # Stage 3
+        ]
+        
+        curriculum = {}
+        stage_examples = int(synthetic_count / 3)
+        
+        for i, distribution in enumerate(difficulty_distributions):
+            stage_name = f"stage_{i+1}"
+            synthetic_examples = self.generator.generate_enhanced_synthetic_examples(
+                stage_examples, distribution
+            )
+            
+            # Combine with appropriate base examples
+            stage_base = [ex for ex in base_examples 
+                         if any(ex.difficulty_level == level for level in distribution.keys())]
+            
+            curriculum[stage_name] = stage_base + synthetic_examples
+            
+        return curriculum
+    
+    def run_comprehensive_evaluation(self, 
+                                   ai_systems: List[Dict[str, Any]],
+                                   test_examples: List[TrainingExample]) -> Dict[str, Any]:
+        """
+        Run comprehensive evaluation across multiple AI systems.
+        
+        Args:
+            ai_systems: List of dicts with 'name', 'version', 'prediction_fn', 'confidence_fn'
+            test_examples: Test examples for evaluation
+        """
+        
+        # Create comprehensive test suite
+        test_suite = self.benchmarker.create_comprehensive_test_suite(test_examples)
+        
+        results = {}
+        
+        for system in ai_systems:
+            system_results = {}
+            
+            # Test on different test suites
+            for suite_name in ["standard", "easy", "hard", "adversarial"]:
+                if suite_name in test_suite:
+                    result = self.benchmarker.benchmark_with_confidence_calibration(
+                        system["name"],
+                        system["version"],
+                        system["prediction_fn"],
+                        system.get("confidence_fn"),
+                        suite_name
+                    )
+                    system_results[suite_name] = result
+            
+            results[system["name"]] = system_results
+        
+        # Generate comparison analysis
+        comparison = self._compare_systems_comprehensive(results)
+        
+        return {
+            "individual_results": results,
+            "comparison_analysis": comparison,
+            "test_suite_stats": self._analyze_test_suite(test_suite)
+        }
+    
+    def _compare_systems_comprehensive(self, results: Dict[str, Dict[str, AIBenchmarkResult]]) -> Dict[str, Any]:
+        """Generate comprehensive system comparison."""
+        
+        comparison = {
+            "overall_ranking": [],
+            "best_by_metric": {},
+            "robustness_analysis": {},
+            "recommendations": {}
+        }
+        
+        # Calculate overall scores
+        overall_scores = {}
+        for system_name, system_results in results.items():
+            if "standard" in system_results:
+                standard_result = system_results["standard"]
+                # Weighted score: accuracy (40%), calibration (20%), consistency (20%), speed (20%)
+                score = (standard_result.accuracy * 0.4 + 
+                        (1 - standard_result.calibration_error) * 0.2 +
+                        standard_result.consistency_score * 0.2 +
+                        min(1.0, 0.1 / max(0.001, standard_result.processing_time)) * 0.2)
+                overall_scores[system_name] = score
+        
+        comparison["overall_ranking"] = sorted(overall_scores.items(), key=lambda x: x[1], reverse=True)
+        
+        # Best system by metric
+        metrics = ["accuracy", "calibration_error", "consistency_score", "processing_time"]
+        for metric in metrics:
+            best_system = None
+            best_value = None
+            
+            for system_name, system_results in results.items():
+                if "standard" in system_results:
+                    value = getattr(system_results["standard"], metric)
+                    if metric == "calibration_error" or metric == "processing_time":
+                        # Lower is better
+                        if best_value is None or value < best_value:
+                            best_value = value
+                            best_system = system_name
+                    else:
+                        # Higher is better
+                        if best_value is None or value > best_value:
+                            best_value = value
+                            best_system = system_name
+            
+            comparison["best_by_metric"][metric] = {"system": best_system, "value": best_value}
+        
+        # Robustness analysis
+        for system_name, system_results in results.items():
+            if "standard" in system_results and "adversarial" in system_results:
+                standard_acc = system_results["standard"].accuracy
+                adversarial_acc = system_results["adversarial"].accuracy
+                robustness_drop = standard_acc - adversarial_acc
+                comparison["robustness_analysis"][system_name] = {
+                    "standard_accuracy": standard_acc,
+                    "adversarial_accuracy": adversarial_acc,
+                    "robustness_drop": robustness_drop,
+                    "robustness_ratio": adversarial_acc / standard_acc if standard_acc > 0 else 0
+                }
+        
+        return comparison
+    
+    def _analyze_test_suite(self, test_suite: Dict[str, List[TrainingExample]]) -> Dict[str, Any]:
+        """Analyze test suite composition and statistics."""
+        
+        stats = {}
+        
+        for suite_name, examples in test_suite.items():
+            if not examples:
+                continue
+                
+            # Difficulty distribution
+            difficulty_dist = Counter(ex.difficulty_level for ex in examples)
+            
+            # Contradiction type distribution
+            type_dist = Counter(ex.contradiction_type for ex in examples)
+            
+            # Average cognitive load
+            avg_cognitive_load = sum(ex.cognitive_load for ex in examples) / len(examples)
+            
+            stats[suite_name] = {
+                "total_examples": len(examples),
+                "difficulty_distribution": {level.name: count for level, count in difficulty_dist.items()},
+                "type_distribution": {ctype.name: count for ctype, count in type_dist.items()},
+                "average_cognitive_load": avg_cognitive_load,
+                "domains": list(set(ex.logical_context.domain for ex in examples))
+            }
+        
+        return stats
+
+# Export functions for easy integration
+def export_for_multiple_platforms(training_examples: List[TrainingExample], 
+                                output_dir: str = "enhanced_training_data") -> None:
+    """Export training data for multiple AI platforms with enhanced formats."""
+    
+    Path(output_dir).mkdir(exist_ok=True)
+    
+    # OpenAI format with enhanced system prompts
+    openai_data = []
+    for example in training_examples:
+        entry = {
+            "messages": [
+                {
+                    "role": "system",
+                    "content": """You are an advanced logical reasoning system trained on MBT (Motion-Based Theory) principles. 
+
+Analyze statements for contradictions using these enhanced categories:
+- Type I: Direct Negation (A vs ¬A)
+- Type II: Property Mismatch (conflicting measurements/values)
+- Type III: Definitional Violation (violates essential properties)
+- Type IV: Counterexample to Universal (exceptions to "all/every" claims)
+- Type V: Modal Logic Conflict (necessity vs possibility conflicts)
+- Type VI: Temporal Inconsistency (time-based contradictions)
+- Type VII: Context-Dependent (contradictions requiring domain knowledge)
+
+Provide detailed reasoning using geometric logic principles where applicable."""
+                },
+                {
+                    "role": "user",
+                    "content": f"""Premise: {example.premise}
+Query: {example.query}
+Domain: {example.logical_context.domain}
+
+Analyze for logical contradictions and explain your reasoning step by step."""
+                },
+                {
+                    "role": "assistant",
+                    "content": f"""**Contradiction Analysis:**
+
+**Type:** {example.contradiction_type.value}
+
+**Reasoning:** {example.explanation}
+
+**MBT Geometric Interpretation:** {example.human_patch}
+
+**Repair Strategy:** {example.repair_action}
+
+**Confidence:** {example.validation_confidence:.2f}
+**Difficulty:** {example.difficulty_level.name}
+**Cognitive Load:** {example.cognitive_load:.2f}
+
+This analysis applies geometric reasoning principles where logical statements are viewed as motion patterns in conceptual space, and contradictions represent incompatible curvature dynamics."""
+                }
+            ]
+        }
+        openai_data.append(entry)
+    
+    # Save OpenAI format
+    with open(f"{output_dir}/openai_enhanced_format.jsonl", 'w') as f:
+        for entry in openai_data:
+            f.write(json.dumps(entry) + '\n')
+    
+    # Enhanced Anthropic format
+    anthropic_data = []
+    for example in training_examples:
+        entry = {
+            "human": f"""I need expert analysis of these statements for logical contradictions:
+
+**Premise:** {example.premise}
+**Query:** {example.query}
+**Context:** {example.logical_context.domain}
+**Difficulty:** {example.difficulty_level.name}
+
+Please provide detailed analysis including:
+1. Contradiction type identification
+2. Step-by-step logical reasoning  
+3. Geometric interpretation (if applicable)
+4. Confidence assessment
+5. Repair recommendations""",
+            
+            "assistant": f"""I'll provide comprehensive logical analysis of these statements:
+
+## 🔍 **Contradiction Analysis**
+
+**Type Identified:** {example.contradiction_type.value}
+
+## 📝 **Step-by-Step Reasoning:**
+
+1. **Premise Analysis:** {example.premise}
+2. **Query Analysis:** {example.query}  
+3. **Logical Relationship:** {example.explanation}
+
+## 🌀 **Geometric Logic Interpretation:**
+{example.human_patch}
+
+This represents the statements as motion patterns in logical space, where contradictions emerge from incompatible geometric dynamics.
+
+## ⚙️ **Repair Strategy:**
+{example.repair_action}
+
+## 📊 **Assessment Metrics:**
+- **Confidence Level:** {example.validation_confidence:.1%}
+- **Difficulty Rating:** {example.difficulty_level.name}
+- **Cognitive Load:** {example.cognitive_load:.2f}/1.0
+- **Domain Context:** {example.logical_context.domain}
+
+## 💡 **Key Insights:**
+This contradiction type is significant because it demonstrates how logical inconsistencies can arise from {example.logical_context.domain} domain assumptions. The repair strategy addresses the core issue while preserving logical coherence."""
+        }
+        anthropic_data.append(entry)
+    
+    # Save Anthropic format
+    with open(f"{output_dir}/anthropic_enhanced_format.json", 'w') as f:
+        json.dump(anthropic_data, f, indent=2)
+    
+    # Enhanced CSV format for analysis
+    with open(f"{output_dir}/enhanced_training_data.csv", 'w', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow([
+            'id', 'premise', 'query', 'contradiction_type', 'explanation', 
+            'human_patch', 'repair_action', 'domain', 'difficulty_level',
+            'cognitive_load', 'validation_confidence', 'created_timestamp',
+            'tags', 'temporal_markers', 'modal_operators', 'quantifiers'
+        ])
+        
+        for example in training_examples:
+            writer.writerow([
+                example.id, example.premise, example.query,
+                example.contradiction_type.value, example.explanation,
+                example.human_patch, example.repair_action,
+                example.logical_context.domain, example.difficulty_level.value,
+                example.cognitive_load, example.validation_confidence,
+                example.created_timestamp.isoformat(),
+                ';'.join(example.tags),
+                ';'.join(example.logical_context.temporal_markers),
+                ';'.join(example.logical_context.modal_operators),
+                ';'.join(example.logical_context.quantifiers)
+            ])
+    
+    # Metadata summary
+    summary = {
+        "total_examples": len(training_examples),
+        "generation_date": datetime.now().isoformat(),
+        "difficulty_distribution": dict(Counter(ex.difficulty_level.name for ex in training_examples)),
+        "type_distribution": dict(Counter(ex.contradiction_type.value for ex in training_examples)),
+        "domain_distribution": dict(Counter(ex.logical_context.domain for ex in training_examples)),
+        "average_cognitive_load": sum(ex.cognitive_load for ex in training_examples) / len(training_examples),
+        "confidence_stats": {
+            "mean": sum(ex.validation_confidence for ex in training_examples) / len(training_examples),
+            "min": min(ex.validation_confidence for ex in training_examples),
+            "max": max(ex.validation_confidence for ex in training_examples)
+        }
+    }
+    
+    with open(f"{output_dir}/dataset_summary.json", 'w') as f:
+        json.dump(summary, f, indent=2)
+    
+    print(f"""
+🚀 **Enhanced Training Data Export Complete!**
+
+📁 **Files Generated:**
+- `openai_enhanced_format.jsonl` - Advanced OpenAI fine-tuning format
+- `anthropic_enhanced_format.json` - Detailed Anthropic training format  
+- `enhanced_training_data.csv` - Comprehensive CSV with metadata
+- `dataset_summary.json` - Statistical analysis and metadata
+
+📊 **Dataset Statistics:**
+- **Total Examples:** {summary['total_examples']}
+- **Average Cognitive Load:** {summary['confidence_stats']['mean']:.3f}
+- **Confidence Range:** {summary['confidence_stats']['min']:.2f} - {summary['confidence_stats']['max']:.2f}
+
+Ready for advanced AI training with MBT-inspired logical reasoning! 🧠✨
+    """)
+
+# Quick start function
+def quick_demo():
+    """Demonstrate the enhanced framework capabilities."""
+    
+    print("🧠 MBT-Enhanced AI Training Framework Demo\n")
+    
+    # Initialize components
+    generator = AdvancedTrainingDataGenerator()
+    benchmarker = EnhancedAIBenchmarker()
+    
+    # Generate sample data
+    print("📊 Generating synthetic training examples...")
+    examples = generator.generate_enhanced_synthetic_examples(50)
+    
+    # Create adversarial examples  
+    print("⚔️ Creating adversarial test cases...")
+    adversarial = generator.create_adversarial_examples(examples[:10])
+    
+    # Export data
+    print("💾 Exporting training data...")
+    export_for_multiple_platforms(examples + adversarial)
+    
+    print("\n✅ Demo complete! Check the 'enhanced_training_data' directory for outputs.")
+    
+    return examples, adversarial
+
+if __name__ == "__main__":
+    # Run demonstration
+    examples, adversarial = quick_demo()
