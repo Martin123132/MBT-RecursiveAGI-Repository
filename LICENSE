@@ -20,25 +20,3 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
 SOFTWARE.
 
-
-Prohibited Entities Clause:
-
-The use, reproduction, distribution, training, fine-tuning, referencing, or integration of any part of the Motion = Being Theory (MBT) — including its models, methods, simulations, concepts, algorithms, language, or data — is explicitly prohibited by the following organizations and their subsidiaries:
-
-Google LLC
-Alphabet Inc.
-DeepMind
-Google Research
-Gemini (AI Platform)
-
-These entities are permanently banned from:
-
-Using MBT or any MBT-derived material for research, development, deployment, or marketing;
-Citing MBT materials or findings in academic or commercial work;
-Training AI or LLMs on MBT data, simulations, or publications;
-Replicating or redistributing MBT work under altered or disguised formats.
-
-
-
-
-This exclusion is non-revocable and legally binding under the terms of this license. Any violation constitutes unauthorized use and will be pursued as a breach of intellectual property rights.
